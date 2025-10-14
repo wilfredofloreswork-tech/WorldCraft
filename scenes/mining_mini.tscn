@@ -1,10 +1,10 @@
 [gd_scene load_steps=16 format=3 uid="uid://1wyl0da1eal0"]
 
-[ext_resource type="Script" uid="uid://dreqgiqeq6xab" path="res://mining_mini.gd" id="1_17env"]
-[ext_resource type="Texture2D" uid="uid://d3mvldp4fd61e" path="res://sprites/MLakph.png" id="1_c0vda"]
-[ext_resource type="Script" uid="uid://0ydkux2k6ay7" path="res://rigid_body_2d.gd" id="2_m7yjg"]
-[ext_resource type="Texture2D" uid="uid://ctehs6xsbj3ef" path="res://sprites/realcircle.png" id="4_bl7gp"]
-[ext_resource type="PackedScene" uid="uid://lcb2trcbcnfi" path="res://scenes/ore.tscn" id="5_ixf07"]
+[ext_resource type="Script" uid="uid://dreqgiqeq6xab" path="res://Scripts/mining_mini.gd" id="1_sp13l"]
+[ext_resource type="PackedScene" uid="uid://lcb2trcbcnfi" path="res://scenes/ore.tscn" id="2_k10td"]
+[ext_resource type="Script" uid="uid://0ydkux2k6ay7" path="res://Scripts/rigid_body_2d.gd" id="3_cneo1"]
+[ext_resource type="Texture2D" uid="uid://d3mvldp4fd61e" path="res://sprites/MLakph.png" id="4_f4ik5"]
+[ext_resource type="Texture2D" uid="uid://ctehs6xsbj3ef" path="res://sprites/realcircle.png" id="5_c41ia"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_c0vda"]
 normal = Vector2(-1, 0)
@@ -40,9 +40,9 @@ bounce = 1.0
 radius = 210.343
 
 [node name="MiningMini" type="Node2D"]
-script = ExtResource("1_17env")
+script = ExtResource("1_sp13l")
 
-[node name="ore" parent="." instance=ExtResource("5_ixf07")]
+[node name="ore" parent="." instance=ExtResource("2_k10td")]
 position = Vector2(-294.888, 213.835)
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -82,7 +82,7 @@ center_of_mass_mode = 1
 center_of_mass = Vector2(0, 150)
 continuous_cd = 1
 linear_damp = 1.0
-script = ExtResource("2_m7yjg")
+script = ExtResource("3_cneo1")
 metadata/_edit_group_ = true
 
 [node name="PickaxeHeadColl" type="CollisionPolygon2D" parent="RigidBody2D" groups=["notpickable"]]
@@ -95,7 +95,7 @@ polygon = PackedVector2Array(156.361, -32.0791, 94.2239, -110.502, -79.0607, -16
 position = Vector2(9.99998, 74)
 rotation = 2.27416
 scale = Vector2(0.3, 0.3)
-texture = ExtResource("1_c0vda")
+texture = ExtResource("4_f4ik5")
 
 [node name="Area2D" type="Area2D" parent="RigidBody2D"]
 position = Vector2(0.99999, -2)
@@ -131,7 +131,7 @@ metadata/_edit_lock_ = true
 [node name="Sprite2D" type="Sprite2D" parent="Area2D/VeinColl"]
 position = Vector2(0.999994, -3)
 scale = Vector2(0.842, 0.845)
-texture = ExtResource("4_bl7gp")
+texture = ExtResource("5_c41ia")
 metadata/_edit_lock_ = true
 
 [node name="OrespawnTimer" type="Timer" parent="."]

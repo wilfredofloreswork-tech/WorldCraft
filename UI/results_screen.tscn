@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://bp7wtqviyjmhi"]
 
-[ext_resource type="Script" uid="uid://bx5smwoa71kmx" path="res://scenes/results_screen.gd" id="1_fqf1x"]
+[ext_resource type="Script" uid="uid://bx5smwoa71kmx" path="res://Scripts/results_screen.gd" id="1_ecyfl"]
 
 [node name="ResultsScreen" type="CanvasLayer"]
-script = ExtResource("1_fqf1x")
+script = ExtResource("1_ecyfl")
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 8

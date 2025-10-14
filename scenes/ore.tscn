@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://lcb2trcbcnfi"]
 
 [ext_resource type="Texture2D" uid="uid://ctehs6xsbj3ef" path="res://sprites/realcircle.png" id="1_84iim"]
-[ext_resource type="Script" uid="uid://ccmk1fjtvonyb" path="res://scenes/ore.gd" id="1_f6cf6"]
+[ext_resource type="Script" uid="uid://ccmk1fjtvonyb" path="res://Scripts/ore.gd" id="1_f6cf6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_e1maq"]
 radius = 26.6833

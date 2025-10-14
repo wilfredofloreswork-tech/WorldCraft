@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://8psyp4shj78y"]
+
+[ext_resource type="Script" uid="uid://c0d1bigegpdfl" path="res://UI/craftingUI.gd" id="1_sac6m"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_365py"]
+resource_local_to_scene = true
+specular_color = Color(0.180005, 0.180005, 0.180005, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_sac6m"]
+resource_local_to_scene = true
+content_margin_left = 50.0
+content_margin_top = 50.0
+content_margin_right = 50.0
+content_margin_bottom = 50.0
+texture = SubResource("CanvasTexture_365py")
+
+[sub_resource type="Theme" id="Theme_c5m30"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_xy40y"]
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Theme" id="Theme_2idwb"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_y8hct"]
+specular_color = Color(0, 0, 0, 1)
+
+[node name="CraftingUI" type="CanvasLayer"]
+script = ExtResource("1_sac6m")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_sac6m")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_c5m30")
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Crafting
+"
+label_settings = SubResource("LabelSettings_xy40y")
+horizontal_alignment = 1
+
+[node name="CategoryTabs" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+
+[node name="RecipeList" type="VBoxContainer" parent="Panel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsPanel" type="VBoxContainer" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CraftButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme = SubResource("Theme_2idwb")
+text = "Craft"
+icon = SubResource("CanvasTexture_y8hct")
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2

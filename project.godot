@@ -17,7 +17,7 @@ config/icon="uid://dsa0ep67ve2pl"
 
 [autoload]
 
-PlayerData="*res://PlayerData.gd"
+PlayerData="*res://Scripts/PlayerData.gd"
 
 [display]
 
