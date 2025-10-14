@@ -1,0 +1,100 @@
+[gd_scene load_steps=11 format=3 uid="uid://1wyl0da1eal0"]
+
+[ext_resource type="Script" uid="uid://dreqgiqeq6xab" path="res://mining_mini.gd" id="1_17env"]
+[ext_resource type="Texture2D" uid="uid://d3mvldp4fd61e" path="res://sprites/MLakph.png" id="1_c0vda"]
+[ext_resource type="Script" uid="uid://0ydkux2k6ay7" path="res://rigid_body_2d.gd" id="2_m7yjg"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_c0vda"]
+normal = Vector2(-1, 0)
+distance = -247.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bl7gp"]
+normal = Vector2(1, 0)
+distance = -233.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_m7yjg"]
+normal = Vector2(0, 1)
+distance = -396.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_17env"]
+distance = -326.0
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_c0vda"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_m7yjg"]
+height = 126.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_m7yjg"]
+radius = 25.02
+
+[node name="MiningMini" type="Node2D"]
+script = ExtResource("1_17env")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(239, 360)
+metadata/_edit_lock_ = true
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(233, 410)
+shape = SubResource("WorldBoundaryShape2D_c0vda")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(231, 394)
+shape = SubResource("WorldBoundaryShape2D_bl7gp")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(231, 394)
+shape = SubResource("WorldBoundaryShape2D_m7yjg")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(231, 394)
+shape = SubResource("WorldBoundaryShape2D_17env")
+metadata/_edit_lock_ = true
+
+[node name="RigidBody2D" type="RigidBody2D" parent="." groups=["pickable"]]
+position = Vector2(230, 533)
+disable_mode = 2
+collision_layer = 2
+mass = 100.0
+physics_material_override = SubResource("PhysicsMaterial_c0vda")
+gravity_scale = 2.0
+inertia = 0.01
+linear_damp = 2.0
+script = ExtResource("2_m7yjg")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+position = Vector2(1, -70)
+rotation = -0.0349066
+shape = SubResource("CapsuleShape2D_m7yjg")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="RigidBody2D" groups=["notpickable"]]
+position = Vector2(9, -50)
+rotation = 2.27416
+scale = Vector2(0.3, 0.3)
+polygon = PackedVector2Array(179.43, 118.811, 156.361, -32.0791, 94.2239, -110.502, -81.2173, -162.765, -65.5778, -180.399, 151.15, -141.296, 192.113, -92.994, 202.921, 120.742)
+
+[node name="Pickaxe" type="Sprite2D" parent="RigidBody2D"]
+position = Vector2(8, -51)
+rotation = 2.27416
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_c0vda")
+
+[node name="Area2D" type="Area2D" parent="RigidBody2D"]
+position = Vector2(-3, -154)
+
+[node name="GrabbableArea" type="CollisionShape2D" parent="RigidBody2D/Area2D"]
+shape = SubResource("CircleShape2D_m7yjg")
+debug_color = Color(0.883081, 0.250998, 0.56466, 0.42)
+metadata/_edit_lock_ = true
+
+[connection signal="mouse_entered" from="RigidBody2D" to="." method="_on_rigid_body_2d_mouse_entered"]
+[connection signal="mouse_shape_entered" from="RigidBody2D" to="." method="_on_rigid_body_2d_mouse_shape_entered"]
+[connection signal="input_event" from="RigidBody2D/Area2D" to="." method="_on_area_2d_input_event"]
+[connection signal="input_event" from="RigidBody2D/Area2D" to="RigidBody2D" method="_on_area_2d_input_event"]

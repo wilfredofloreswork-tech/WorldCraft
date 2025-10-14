@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://lcb2trcbcnfi"]
+
+[ext_resource type="Texture2D" uid="uid://ctehs6xsbj3ef" path="res://sprites/realcircle.png" id="1_84iim"]
+[ext_resource type="Script" uid="uid://ccmk1fjtvonyb" path="res://scenes/ore.gd" id="1_f6cf6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_e1maq"]
+radius = 26.6833
+
+[node name="ore" type="Area2D"]
+collision_mask = 2
+linear_damp = 100.0
+angular_damp = 100.0
+script = ExtResource("1_f6cf6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_e1maq")
+one_way_collision_margin = 27.5
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D"]
+position = Vector2(0, -3.63798e-12)
+scale = Vector2(0.103, 0.098)
+texture = ExtResource("1_84iim")

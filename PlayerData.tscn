@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcpy0v0yhtdqt"]
+
+[ext_resource type="Script" uid="uid://demqf0ak7ghq4" path="res://PlayerData.gd" id="1_7odln"]
+[ext_resource type="Script" uid="uid://4g161lmpaas8" path="res://TestPlayerData.gd" id="2_dlt2f"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7odln")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("2_dlt2f")
