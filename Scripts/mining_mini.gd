@@ -92,17 +92,17 @@ func apply_equipment_bonus():
 		"mithril_pickaxe":
 			game_duration += 5.0
 			time_remaining += 5.0
-			
+'''
 func _on_crafting_button_pressed():
 	if Input.is_action_just_pressed("craft_button"):
-		print("yahoo")
 		var crafting_scene = load("res://UI/crafting_ui.tscn")
 		var crafting_ui = crafting_scene.instantiate()
 		add_child(crafting_ui)
 		crafting_ui.show_crafting()
+'''
 
 func _process(delta):
-	_on_crafting_button_pressed()
+#	_on_crafting_button_pressed()
 	if not game_active:
 		return
 	

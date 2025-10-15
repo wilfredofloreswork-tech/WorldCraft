@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://nnwyiapgen0w"]
+[gd_scene load_steps=3 format=3 uid="uid://nnwyiapgen0w"]
 
 [ext_resource type="Script" uid="uid://ke1nmps7px6o" path="res://Scripts/PlayerTestData2.gd" id="1_7y2xs"]
+[ext_resource type="PackedScene" uid="uid://bvq8h3m5yn7rf" path="res://UI/inventory_ui.tscn" id="2_r32pp"]
 
 [node name="Node" type="Node"]
 script = ExtResource("1_7y2xs")
+
+[node name="InventoryUI" parent="." instance=ExtResource("2_r32pp")]
