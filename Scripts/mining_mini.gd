@@ -54,6 +54,7 @@ func _ready():
 	
 	# Connect timer
 	spawn_timer.timeout.connect(_on_timer_timeout)
+
 	
 	# Spawn initial ores (all same type)
 	var initial_ores = 3
@@ -91,8 +92,17 @@ func apply_equipment_bonus():
 		"mithril_pickaxe":
 			game_duration += 5.0
 			time_remaining += 5.0
+			
+func _on_crafting_button_pressed():
+	if Input.is_action_just_pressed("craft_button"):
+		print("yahoo")
+		var crafting_scene = load("res://UI/crafting_ui.tscn")
+		var crafting_ui = crafting_scene.instantiate()
+		add_child(crafting_ui)
+		crafting_ui.show_crafting()
 
 func _process(delta):
+	_on_crafting_button_pressed()
 	if not game_active:
 		return
 	
@@ -281,7 +291,7 @@ func show_results_screen(total_xp: int):
 	print("Current ore name: " + current_ore_name)
 	
 	# Load and show results screen
-	var results_scene = preload("res://scenes/results_screen.tscn")
+	var results_scene = preload("res://UI/results_screen.tscn")
 	var results = results_scene.instantiate()
 	add_child(results)
 	
