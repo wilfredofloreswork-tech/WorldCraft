@@ -305,9 +305,9 @@ func show_results_screen(total_xp: int):
 	results.continue_pressed.connect(return_to_map)
 
 func return_to_map():
-	print("Returning to map...")
-	# TODO: Implement scene transition back to map
-	# get_tree().change_scene_to_file("res://scenes/MainMap.tscn")
+	print("Returning to hub...")
+	# Return to the main hub
+	get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):

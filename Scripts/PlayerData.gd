@@ -190,9 +190,41 @@ var recipes = {
 		"category": "pickaxe",
 		"description": "Legendary pickaxe. +5s mining time"
 	},
-	
-	# Future: Axes, fishing rods, armor, etc.
-	# "bronze_axe": { ... },
+		# Axes
+	"bronze_axe": {
+		"requires": {"copper_ore": 1, "tin_ore": 1},
+		"skill_required": {"smithing": 1},
+		"produces": "bronze_axe",
+		"xp_granted": {"smithing": 12.5},
+		"category": "tool",
+		"description": "A basic axe. +5s woodcutting time"
+	},
+	"iron_axe": {
+		"requires": {"iron_ore": 3},
+		"skill_required": {"smithing": 15},
+		"produces": "iron_axe",
+		"xp_granted": {"smithing": 25},
+		"category": "tool",
+		"description": "Sturdy iron axe. +10s woodcutting time"
+	},
+	"steel_axe": {
+		"requires": {"iron_ore": 2, "coal": 2},
+		"skill_required": {"smithing": 30},
+		"produces": "steel_axe",
+		"xp_granted": {"smithing": 50},
+		"category": "tool",
+		"description": "Strong steel axe. +15s woodcutting time"
+	},
+	"mithril_axe": {
+		"requires": {"mithril_ore": 4, "coal": 4},
+		"skill_required": {"smithing": 50},
+		"produces": "mithril_axe",
+		"xp_granted": {"smithing": 120},
+		"category": "tool",
+		"description": "Legendary axe. +25s woodcutting time"
+	},
+	# Future: fishing rods, armor, etc.
+
 	# "fishing_rod": { ... },
 }
 

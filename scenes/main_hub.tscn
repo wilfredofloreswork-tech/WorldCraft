@@ -1,0 +1,170 @@
+[gd_scene load_steps=12 format=3 uid="uid://dqtulre612u6"]
+
+[ext_resource type="Script" uid="uid://0bmuk3g0bco2" path="res://scenes/MainHub.gd" id="1_oa6wl"]
+[ext_resource type="Texture2D" uid="uid://bra1xaslimjb1" path="res://sprites/rossypoo.png" id="2_7v7ny"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+
+[sub_resource type="Sky" id="Sky_hub"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_hub"]
+background_mode = 2
+sky = SubResource("Sky_hub")
+ambient_light_source = 3
+ambient_light_color = Color(0.8, 0.8, 0.8, 1)
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.3
+glow_bloom = 0.2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(20, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.3, 0.5, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3rplo"]
+albedo_texture = ExtResource("2_7v7ny")
+
+[sub_resource type="SphereMesh" id="SphereMesh_player"]
+
+[sub_resource type="Skin" id="Skin_edbvw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e8wc2"]
+
+[node name="MainHub" type="Node3D"]
+script = ExtResource("1_oa6wl")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_hub")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 8, 0)
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="PlayerAvatar" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.5, 0)
+material_override = SubResource("StandardMaterial3D_3rplo")
+mesh = SubResource("SphereMesh_player")
+skin = SubResource("Skin_edbvw")
+surface_material_override/0 = SubResource("StandardMaterial3D_e8wc2")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)
+fov = 60.0
+
+[node name="HubUI" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="Panel" parent="HubUI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HubUI/TopBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="PlayerInfo" type="VBoxContainer" parent="HubUI/TopBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayerName" type="Label" parent="HubUI/TopBar/HBoxContainer/PlayerInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player"
+
+[node name="TotalLevel" type="Label" parent="HubUI/TopBar/HBoxContainer/PlayerInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Total Level: 6"
+
+[node name="Spacer" type="Control" parent="HubUI/TopBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MenuButtons" type="HBoxContainer" parent="HubUI/TopBar/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="InventoryButton" type="Button" parent="HubUI/TopBar/HBoxContainer/MenuButtons"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+text = "Inventory"
+
+[node name="CraftingButton" type="Button" parent="HubUI/TopBar/HBoxContainer/MenuButtons"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+text = "Crafting"
+
+[node name="SkillsButton" type="Button" parent="HubUI/TopBar/HBoxContainer/MenuButtons"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+text = "Skills"
+
+[node name="PetsButton" type="Button" parent="HubUI/TopBar/HBoxContainer/MenuButtons"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+text = "Pets"
+
+[node name="BottomBar" type="Panel" parent="HubUI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HubUI/BottomBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 5
+
+[node name="ActivityButtons" type="HBoxContainer" parent="HubUI/BottomBar/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="MiningButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+text = "⛏️ Mining"
+
+[node name="WoodcuttingButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+text = "🪓 Woodcut
+"
+
+[node name="FishingButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
+custom_minimum_size = Vector2(100, 60)
+layout_mode = 2
+disabled = true
+text = "🎣 Fishing
+(Soon)"

@@ -31,6 +31,15 @@ var item_info = {
 	"steel_pickaxe": {"category": "tool", "display_name": "Steel Pickaxe", "description": "Strong steel pickaxe. +3s mining time.", "color": Color(0.7, 0.7, 0.75)},
 	"mithril_pickaxe": {"category": "tool", "display_name": "Mithril Pickaxe", "description": "Legendary pickaxe. +5s mining time.", "color": Color(0.6, 0.9, 1.0)},
 	
+	# Tools - Axes
+	"bronze_axe": {"category": "tool", "display_name": "Bronze Axe", "description": "Basic axe. +5s woodcutting time.", "color": Color(0.8, 0.5, 0.2)},
+	"iron_axe": {"category": "tool", "display_name": "Iron Axe", "description": "Sturdy iron axe. +10s woodcutting time.", "color": Color(0.6, 0.6, 0.65)},
+	"steel_axe": {"category": "tool", "display_name": "Steel Axe", "description": "Strong steel axe. +15s woodcutting time.", "color": Color(0.7, 0.7, 0.75)},
+	"mithril_axe": {"category": "tool", "display_name": "Mithril Axe", "description": "Legendary axe. +25s woodcutting time.", "color": Color(0.6, 0.9, 1.0)},
+	
+	# Logs
+	"oak_log": {"category": "resource", "display_name": "Oak Log", "description": "Basic oak logs for woodworking.", "color": Color(0.6, 0.4, 0.2)},
+	
 	# Future items can be added here
 	# "bronze_axe": {...},
 	# "fishing_rod": {...},
@@ -210,26 +219,26 @@ func display_item_details(item_name: String):
 	# Title with quantity
 	var title = Label.new()
 	title.text = get_item_display_name(item_name)
-	title.add_theme_font_size_override("font_size", 24)
+	title.add_theme_font_size_override("font_size", 18)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	item_details.add_child(title)
 	
 	var qty_label = Label.new()
 	qty_label.text = "Quantity: " + str(quantity)
-	qty_label.add_theme_font_size_override("font_size", 18)
+	qty_label.add_theme_font_size_override("font_size", 14)
 	qty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	qty_label.modulate = Color(1.0, 1.0, 0.7)
 	item_details.add_child(qty_label)
 	
 	# Spacer
 	var spacer1 = Control.new()
-	spacer1.custom_minimum_size = Vector2(0, 10)
+	spacer1.custom_minimum_size = Vector2(0, 5)
 	item_details.add_child(spacer1)
 	
 	# Description
 	var desc = Label.new()
 	desc.text = get_item_description(item_name)
-	desc.add_theme_font_size_override("font_size", 14)
+	desc.add_theme_font_size_override("font_size", 12)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	item_details.add_child(desc)
@@ -247,7 +256,7 @@ func display_item_details(item_name: String):
 		
 		# Equip/Unequip button
 		var equip_button = Button.new()
-		equip_button.custom_minimum_size = Vector2(150, 40)
+		equip_button.custom_minimum_size = Vector2(120, 35)
 		
 		if is_equipped:
 			equip_button.text = "Unequip"
