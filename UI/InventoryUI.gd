@@ -40,9 +40,10 @@ var item_info = {
 	# Logs
 	"oak_log": {"category": "resource", "display_name": "Oak Log", "description": "Basic oak logs for woodworking.", "color": Color(0.6, 0.4, 0.2)},
 	
-	# Future items can be added here
-	# "bronze_axe": {...},
-	# "fishing_rod": {...},
+	"raw_fish": {"category": "resource", "display_name": "Raw Fish", "description": "Common fish. Can be cooked.", "color": Color(0.7, 0.7, 0.8)},
+	"salmon": {"category": "resource", "display_name": "Salmon", "description": "Quality fish. Harder to catch.", "color": Color(1.0, 0.6, 0.5)},
+	"tuna": {"category": "resource", "display_name": "Tuna", "description": "Large fish. Very challenging.", "color": Color(0.4, 0.5, 0.8)},
+	"lobster": {"category": "resource", "display_name": "Lobster", "description": "Rare crustacean. Extremely difficult.", "color": Color(0.9, 0.3, 0.2)},
 }
 
 func _ready():

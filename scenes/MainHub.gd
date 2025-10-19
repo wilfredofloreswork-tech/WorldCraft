@@ -143,9 +143,9 @@ func _on_woodcutting_pressed():
 	get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
 
 func _on_fishing_pressed():
-	print("Fishing coming soon!")
-
-# ===== MENU CLOSE HANDLERS =====
+	print("Starting fishing minigame...")
+	# Load and switch to fishing scene
+	get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
 
 func _on_inventory_closed():
 	print("Inventory closed")

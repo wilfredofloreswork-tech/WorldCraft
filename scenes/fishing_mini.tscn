@@ -1,0 +1,137 @@
+[gd_scene load_steps=2 format=3 uid="uid://bcp3t1s8prhs6"]
+
+[ext_resource type="Script" uid="uid://irftobboitwt" path="res://Scripts/fishing_mini.gd" id="1_fishing"]
+
+[node name="FishingMini" type="Node2D"]
+script = ExtResource("1_fishing")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(240, 360)
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 480.0
+offset_bottom = 720.0
+color = Color(0.2, 0.4, 0.6, 1)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TimerLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 120.0
+offset_bottom = 43.0
+theme_override_font_sizes/font_size = 20
+text = "Time: 30.0"
+
+[node name="FishCountLabel" type="Label" parent="UI"]
+offset_left = 280.0
+offset_top = 20.0
+offset_right = 460.0
+offset_bottom = 43.0
+theme_override_font_sizes/font_size = 18
+text = "Raw Fish: 0"
+horizontal_alignment = 2
+
+[node name="InstructionLabel" type="Label" parent="UI"]
+offset_left = 140.0
+offset_top = 650.0
+offset_right = 340.0
+offset_bottom = 690.0
+theme_override_font_sizes/font_size = 24
+text = "Click to cast!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FishingBarBG" type="ColorRect" parent="."]
+visible = false
+offset_left = 190.0
+offset_top = 100.0
+offset_right = 290.0
+offset_bottom = 600.0
+color = Color(0.2, 0.2, 0.3, 1)
+
+[node name="BorderTop" type="ColorRect" parent="FishingBarBG"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 102.0
+
+[node name="BorderBottom" type="ColorRect" parent="FishingBarBG"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = 500.0
+offset_right = 102.0
+offset_bottom = 502.0
+
+[node name="BorderLeft" type="ColorRect" parent="FishingBarBG"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -2.0
+offset_bottom = 502.0
+
+[node name="BorderRight" type="ColorRect" parent="FishingBarBG"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = -2.0
+offset_right = 102.0
+offset_bottom = 502.0
+
+[node name="CatchBar" type="ColorRect" parent="."]
+visible = false
+offset_left = 190.0
+offset_top = 400.0
+offset_right = 290.0
+offset_bottom = 525.0
+color = Color(0.2, 1, 0.2, 0.8)
+
+[node name="FishSprite" type="ColorRect" parent="."]
+visible = false
+offset_left = 205.0
+offset_top = 295.0
+offset_right = 275.0
+offset_bottom = 325.0
+color = Color(1, 0.5, 0, 1)
+
+[node name="FishIcon" type="Label" parent="FishSprite"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "🐟"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+visible = false
+offset_left = 320.0
+offset_top = 150.0
+offset_right = 360.0
+offset_bottom = 550.0
+max_value = 1.0
+fill_mode = 3
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="ProgressBar"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 25.0
+offset_top = -150.0
+offset_right = 125.0
+offset_bottom = -127.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "CATCH"
+vertical_alignment = 1

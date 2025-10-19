@@ -165,6 +165,5 @@ text = "🪓 Woodcut
 [node name="FishingButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
-disabled = true
 text = "🎣 Fishing
-(Soon)"
+"

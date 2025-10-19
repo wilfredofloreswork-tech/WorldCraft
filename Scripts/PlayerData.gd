@@ -223,9 +223,38 @@ var recipes = {
 		"category": "tool",
 		"description": "Legendary axe. +25s woodcutting time"
 	},
-	# Future: fishing rods, armor, etc.
-
-	# "fishing_rod": { ... },
+	"basic_rod": {
+	"requires": {"oak_log": 5},
+	"skill_required": {"woodcutting": 5},
+	"produces": "basic_rod",
+	"xp_granted": {"woodcutting": 15},
+	"category": "tool",
+	"description": "Simple fishing rod. +5s fishing time"
+},
+"good_rod": {
+	"requires": {"oak_log": 10, "iron_ore": 2},
+	"skill_required": {"woodcutting": 15, "smithing": 10},
+	"produces": "good_rod",
+	"xp_granted": {"woodcutting": 30, "smithing": 20},
+	"category": "tool",
+	"description": "Quality fishing rod. +10s fishing time, larger catch bar"
+},
+"great_rod": {
+	"requires": {"oak_log": 15, "steel_pickaxe": 1},
+	"skill_required": {"woodcutting": 30, "smithing": 25},
+	"produces": "great_rod",
+	"xp_granted": {"woodcutting": 60, "smithing": 40},
+	"category": "tool",
+	"description": "Great fishing rod. +15s fishing time, larger catch bar"
+},
+"master_rod": {
+	"requires": {"oak_log": 25, "mithril_ore": 5, "gold_ore": 3},
+	"skill_required": {"woodcutting": 50, "smithing": 50, "fishing": 40},
+	"produces": "master_rod",
+	"xp_granted": {"woodcutting": 150, "smithing": 100},
+	"category": "tool",
+	"description": "Master fishing rod. +20s fishing time, much larger catch bar"
+}
 }
 
 # ===== CRAFTING FUNCTIONS =====
