@@ -1,15 +1,22 @@
-extends Area2D
-# log.gd - Individual log that can be hit and sorted
+extends RigidBody2D
+# log.gd - Individual log that can be hit and sorted (physics-based)
 
 signal log_hit(log, hit_direction)
 
 var is_good_log := true
+var already_hit := false  # Prevent multiple hits
 
 # Visual settings
 const GOOD_COLOR = Color(0.6, 0.4, 0.2)  # Brown
 const BAD_COLOR = Color(0.4, 0.2, 0.15)  # Deep red-brown
 
 func _ready():
+
+	# Physics settings - constrained but can fall
+	gravity_scale = 1.0
+	lock_rotation = true  # Keep logs upright
+	freeze = false
+	
 	# Connect collision detection
 	body_entered.connect(_on_body_entered)
 
@@ -19,6 +26,9 @@ func setup_log(good: bool):
 	
 	# Color the sprite
 	var sprite = get_node_or_null("Sprite2D")
+	if not sprite:
+		sprite = get_node_or_null("ColorRect")
+	
 	if sprite:
 		sprite.modulate = GOOD_COLOR if is_good_log else BAD_COLOR
 	
@@ -36,18 +46,37 @@ func add_quality_label():
 
 func _on_body_entered(body):
 	"""Detect when axe hits this log"""
-	if body.name == "AxeHead":
-		# Determine which side was hit based on axe position
-		var hit_from_left = body.global_position.x < global_position.x
-		var direction = "left" if hit_from_left else "right"
+	if already_hit:
+		return
 		
-		print("Log hit from " + direction + " side")
-		
-		# Emit signal with direction
-		log_hit.emit(self, direction)
-		
-		# Visual feedback
-		flash_hit()
+	print("Body entered log: " + body.name)
+	
+	if body.name == "AxeHead" or "Axe" in body.name:
+		hit_by_axe(body)
+
+func hit_by_axe(axe_node):
+	"""Process axe hit"""
+	if already_hit:
+		return
+	
+	already_hit = true  # Mark as hit to prevent multiple triggers
+	
+	# Determine which side was hit based on axe position
+	var hit_from_left = axe_node.global_position.x < global_position.x
+	var direction = "left" if hit_from_left else "right"
+	
+	print("Log hit from " + direction + " side")
+	
+	# Disable physics constraints for flying to basket
+	freeze = true
+	collision_layer = 0  # Stop colliding with other logs
+	collision_mask = 0
+	
+	# Emit signal with direction
+	log_hit.emit(self, direction)
+	
+	# Visual feedback
+	flash_hit()
 
 func flash_hit():
 	"""Quick flash when hit"""

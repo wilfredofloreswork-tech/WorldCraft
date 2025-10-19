@@ -18,7 +18,7 @@ var time_remaining := 0.0
 @onready var log_scene = preload("res://scenes/log.tscn")
 @onready var spawn_timer = $LogSpawnTimer
 @onready var log_container = $LogContainer
-@onready var axe = $Axe
+@onready var axe = $Axe if has_node("Axe") else null
 
 # UI References
 @onready var timer_label = $UI/TimerLabel if has_node("UI/TimerLabel") else null
@@ -32,7 +32,7 @@ const RIGHT_BASKET_X = 380.0  # Good logs
 # Log spawn and stack settings
 const LOG_SPAWN_X = 240.0  # Center of screen
 const LOG_START_Y = 100.0
-const LOG_SPACING = 80.0
+const LOG_SPACING = 65.0  # Closer together like poker chips
 var log_stack = []
 
 func _ready():
@@ -116,8 +116,8 @@ func spawn_log():
 	var is_good = randf() > 0.5
 	new_log.setup_log(is_good)
 	
-	# Position at top of stack
-	new_log.position = Vector2(LOG_SPAWN_X, LOG_START_Y)
+	# Spawn at top, physics will make it fall and stack
+	new_log.position = Vector2(LOG_SPAWN_X, LOG_START_Y - 100)
 	
 	# Add to stack
 	log_stack.append(new_log)
@@ -125,20 +125,16 @@ func spawn_log():
 	# Connect signal
 	new_log.log_hit.connect(_on_log_hit)
 	
-	# Reposition all logs in stack
-	update_log_positions()
-	
 	print("Spawned " + ("GOOD" if is_good else "BAD") + " log")
 
 func update_log_positions():
-	# Move all logs to their correct stacked positions
+	# Move all logs to their correct stacked positions - INSTANT drop like poker chips
 	for i in range(log_stack.size()):
 		var target_y = LOG_START_Y + (i * LOG_SPACING)
 		var log = log_stack[i]
 		
-		# Animate to position
-		var tween = create_tween()
-		tween.tween_property(log, "position:y", target_y, 0.2)
+		# Instant position change - logs drop immediately
+		log.position.y = target_y
 
 func _on_log_hit(log: Node, hit_direction: String):
 	"""Called when axe hits a log with direction info"""
@@ -147,11 +143,11 @@ func _on_log_hit(log: Node, hit_direction: String):
 	# Check if sorting is correct
 	var correct = false
 	
-	if hit_direction == "left" and not log.is_good_log:
-		# Hit left side, sent to right basket (bad logs) - CORRECT
+	if hit_direction == "right" and not log.is_good_log:
+		# Hit right side, sent to left basket (bad logs) - CORRECT
 		correct = true
-	elif hit_direction == "right" and log.is_good_log:
-		# Hit right side, sent to left basket (good logs) - CORRECT
+	elif hit_direction == "left" and log.is_good_log:
+		# Hit left side, sent to right basket (good logs) - CORRECT
 		correct = true
 	
 	# Score it
@@ -164,14 +160,14 @@ func _on_log_hit(log: Node, hit_direction: String):
 		score = max(0, score - 5)  # Don't go negative
 		show_feedback("Wrong! -5", Color.RED)
 	
-	# Remove log from stack
+	# Remove log from stack FIRST
 	log_stack.erase(log)
 	
-	# Fly log to basket
-	fly_log_to_basket(log, hit_direction)
-	
-	# Update remaining log positions
+	# Update remaining log positions IMMEDIATELY (poker chip drop)
 	update_log_positions()
+	
+	# Then fly log to basket
+	fly_log_to_basket(log, hit_direction)
 	
 	update_ui()
 
