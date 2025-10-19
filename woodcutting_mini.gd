@@ -1,5 +1,5 @@
 extends Node2D
-# WoodcuttingMini.gd - Log sorting minigame
+# WoodcuttingMini.gd - logg sorting minigame
 
 # Game state
 var score := 0
@@ -7,7 +7,7 @@ var correct_sorts := 0
 var wrong_sorts := 0
 var game_active := true
 
-# Log type for this session (set from world map)
+# logg type for this session (set from world map)
 var current_log_type = "oak_log"
 
 # Time settings
@@ -29,10 +29,11 @@ var time_remaining := 0.0
 const LEFT_BASKET_X = 100.0  # Bad logs
 const RIGHT_BASKET_X = 380.0  # Good logs
 
-# Log spawn and stack settings
+# logg spawn and stack settings
 const LOG_SPAWN_X = 240.0  # Center of screen
 const LOG_START_Y = 100.0
 const LOG_SPACING = 65.0  # Closer together like poker chips
+const MAX_LOGS = 9  # Keep 7 logs on screen at all times
 var log_stack = []
 
 func _ready():
@@ -44,19 +45,21 @@ func _ready():
 	# Equipment bonus
 	apply_equipment_bonus()
 	
-	# Start spawning logs
-	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
-	spawn_timer.start()
-	
-	# Spawn initial logs
-	for i in range(3):
+	# Spawn initial logs to fill the stack
+	for i in range(MAX_LOGS):
 		spawn_log()
+		await get_tree().create_timer(0.2).timeout  # Small delay between spawns
+	
+	# Start monitoring to maintain logg count
+	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
+	spawn_timer.wait_time = 0.5  # Check twice per second
+	spawn_timer.start()
 	
 	update_ui()
 	print("Woodcutting started! Sort logs into correct baskets!")
 
 func set_log_type(log_type: String):
-	"""Call this before starting the minigame to set what log type to cut"""
+	"""Call this before starting the minigame to set what logg type to cut"""
 	current_log_type = log_type
 
 func apply_equipment_bonus():
@@ -105,14 +108,15 @@ func update_ui():
 		score_label.text = "Score: %d\nCorrect: %d | Wrong: %d" % [score, correct_sorts, wrong_sorts]
 
 func _on_spawn_timer_timeout():
-	if game_active and log_stack.size() < 6:  # Max 6 logs on screen
+	# Maintain constant logg count - spawn new logg if below MAX_LOGS
+	if game_active and log_stack.size() < MAX_LOGS:
 		spawn_log()
 
 func spawn_log():
 	var new_log = log_scene.instantiate()
 	log_container.add_child(new_log)
 	
-	# Determine if good or bad log (50/50 chance for now)
+	# Determine if good or bad logg (50/50 chance for now)
 	var is_good = randf() > 0.5
 	new_log.setup_log(is_good)
 	
@@ -125,28 +129,19 @@ func spawn_log():
 	# Connect signal
 	new_log.log_hit.connect(_on_log_hit)
 	
-	print("Spawned " + ("GOOD" if is_good else "BAD") + " log")
+	print("Spawned " + ("GOOD" if is_good else "BAD") + " logg")
 
-func update_log_positions():
-	# Move all logs to their correct stacked positions - INSTANT drop like poker chips
-	for i in range(log_stack.size()):
-		var target_y = LOG_START_Y + (i * LOG_SPACING)
-		var log = log_stack[i]
-		
-		# Instant position change - logs drop immediately
-		log.position.y = target_y
-
-func _on_log_hit(log: Node, hit_direction: String):
-	"""Called when axe hits a log with direction info"""
-	print("Log hit! Direction: " + hit_direction + ", Is Good: " + str(log.is_good_log))
+func _on_log_hit(logg: Node, hit_direction: String):
+	"""Called when axe hits a logg with direction info"""
+	print("logg hit! Direction: " + hit_direction + ", Is Good: " + str(logg.is_good_log))
 	
 	# Check if sorting is correct
 	var correct = false
 	
-	if hit_direction == "right" and not log.is_good_log:
+	if hit_direction == "right" and not logg.is_good_log:
 		# Hit right side, sent to left basket (bad logs) - CORRECT
 		correct = true
-	elif hit_direction == "left" and log.is_good_log:
+	elif hit_direction == "left" and logg.is_good_log:
 		# Hit left side, sent to right basket (good logs) - CORRECT
 		correct = true
 	
@@ -160,31 +155,31 @@ func _on_log_hit(log: Node, hit_direction: String):
 		score = max(0, score - 5)  # Don't go negative
 		show_feedback("Wrong! -5", Color.RED)
 	
-	# Remove log from stack FIRST
-	log_stack.erase(log)
+	# Remove logg from stack
+	log_stack.erase(logg)
 	
-	# Update remaining log positions IMMEDIATELY (poker chip drop)
-	update_log_positions()
+	# Fly logg to basket (physics already disabled in logg.gd)
+	fly_log_to_basket(logg, hit_direction)
 	
-	# Then fly log to basket
-	fly_log_to_basket(log, hit_direction)
+	# Logs will fall naturally due to physics!
+	# New logg will spawn automatically via timer to maintain MAX_LOGS count
 	
 	update_ui()
 
-func fly_log_to_basket(log: Node, direction: String):
-	"""Animate log flying to the appropriate basket"""
+func fly_log_to_basket(logg: Node, direction: String):
+	"""Animate logg flying to the appropriate basket"""
 	var target_x = RIGHT_BASKET_X if direction == "left" else LEFT_BASKET_X
 	var target_y = 650.0  # Bottom of screen
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(log, "position:x", target_x, 0.5)
-	tween.tween_property(log, "position:y", target_y, 0.5)
-	tween.tween_property(log, "rotation", randf_range(-PI/4, PI/4), 0.5)
-	tween.tween_property(log, "modulate:a", 0.0, 0.5)
+	tween.tween_property(logg, "position:x", target_x, 0.5)
+	tween.tween_property(logg, "position:y", target_y, 0.5)
+	tween.tween_property(logg, "rotation", randf_range(-PI/4, PI/4), 0.5)
+	tween.tween_property(logg, "modulate:a", 0.0, 0.5)
 	
 	await tween.finished
-	log.queue_free()
+	logg.queue_free()
 
 func show_feedback(text: String, color: Color):
 	if not feedback_label:

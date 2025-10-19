@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dgos7modwwbha"]
+[gd_scene load_steps=10 format=3 uid="uid://dgos7modwwbha"]
 
 [ext_resource type="Script" uid="uid://bo3xuur1nfmo2" path="res://woodcutting_mini.gd" id="1_ogem5"]
 [ext_resource type="Script" uid="uid://g0lhtjifmmpt" path="res://scenes/axe.gd" id="2_mdt7r"]
@@ -7,15 +7,20 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_h1anq"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h1anq"]
-bounce = 1.0
+friction = 0.0
+bounce = 3.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_axehead"]
 radius = 34.0588
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_scdf3"]
+absorbent = true
 
-[sub_resource type="ConcavePolygonShape2D" id="ConcavePolygonShape2D_scdf3"]
-segments = PackedVector2Array(27, -800, 27, -800, 27, 0, 27, -800, 150, 0, 150, -800, 27, 0, 150, 0)
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_w7rs2"]
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ktdxi"]
+size = Vector2(69, 104)
 
 [node name="WoodcuttingMini" type="Node2D"]
 script = ExtResource("1_ogem5")
@@ -95,9 +100,9 @@ theme_override_font_sizes/font_size = 20
 text = "Time: 30.0"
 
 [node name="ScoreLabel" type="Label" parent="UI"]
-offset_left = 320.0
+offset_left = 293.0
 offset_top = 20.0
-offset_right = 460.0
+offset_right = 454.0
 offset_bottom = 80.0
 theme_override_font_sizes/font_size = 16
 text = "Score: 0
@@ -128,7 +133,7 @@ shape = SubResource("CircleShape2D_h1anq")
 [node name="AxeHead" type="RigidBody2D" parent="Axe"]
 position = Vector2(1, 35)
 collision_layer = 2
-collision_mask = 8
+collision_mask = 136
 physics_material_override = SubResource("PhysicsMaterial_h1anq")
 gravity_scale = 0.0
 freeze = true
@@ -163,6 +168,21 @@ linear_damp = 100.0
 angular_damp_mode = 1
 angular_damp = 100.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+[node name="CollisionShape2D" type="CollisionPolygon2D" parent="RigidBody2D"]
 position = Vector2(148, 418)
-shape = SubResource("ConcavePolygonShape2D_scdf3")
+build_mode = 1
+polygon = PackedVector2Array(29, -800, 150, -800, 150, 0, 29, 0)
+
+[node name="RigidBody2D2" type="RigidBody2D" parent="."]
+collision_layer = 128
+collision_mask = 2
+mass = 500.0
+physics_material_override = SubResource("PhysicsMaterial_w7rs2")
+gravity_scale = 0.0
+lock_rotation = true
+freeze = true
+freeze_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
+position = Vector2(238, 405)
+shape = SubResource("RectangleShape2D_ktdxi")
