@@ -15,7 +15,7 @@ var current_log_type = "oak_log"
 var time_remaining := 0.0
 
 # References
-@onready var log_scene = preload("res://scenes/log.tscn")
+@onready var log_scene = preload("res://Scenes/log.tscn")
 @onready var spawn_timer = $LogSpawnTimer
 @onready var log_container = $LogContainer
 @onready var axe = $Axe if has_node("Axe") else null
@@ -33,7 +33,7 @@ const RIGHT_BASKET_X = 380.0  # Good logs
 const LOG_SPAWN_X = 240.0  # Center of screen
 const LOG_START_Y = 100.0
 const LOG_SPACING = 65.0  # Closer together like poker chips
-const MAX_LOGS = 9  # Keep 7 logs on screen at all times
+const MAX_LOGS = 8  # Keep 7 logs on screen at all times
 var log_stack = []
 
 func _ready():
@@ -81,8 +81,9 @@ func _process(delta):
 		time_remaining = 0
 		end_minigame()
 	
-	update_ui()
-
+	if Engine.get_physics_frames() % 10 == 0:
+		update_ui()
+		
 func update_ui():
 	if timer_label:
 		timer_label.text = "Time: %.1f" % time_remaining
@@ -119,12 +120,9 @@ func spawn_log():
 	
 	# Connect signal
 	new_log.log_hit.connect(_on_log_hit)
-	
-	print("Spawned " + ("GOOD" if is_good else "BAD") + " logg")
 
 func _on_log_hit(logg: Node, hit_direction: String):
 	"""Called when axe hits a logg with direction info"""
-	print("logg hit! Direction: " + hit_direction + ", Is Good: " + str(logg.is_good_log))
 	
 	# Check if sorting is correct
 	var correct = false
@@ -140,11 +138,11 @@ func _on_log_hit(logg: Node, hit_direction: String):
 	if correct:
 		correct_sorts += 1
 		score += 10
-		show_feedback("Good! +10", Color.GREEN)
+		#show_feedback("Good! +10", Color.GREEN)
 	else:
 		wrong_sorts += 1
 		score = max(0, score - 5)  # Don't go negative
-		show_feedback("Wrong! -5", Color.RED)
+		#show_feedback("Wrong! -5", Color.RED)
 	
 	# Remove logg from stack
 	log_stack.erase(logg)
@@ -155,7 +153,6 @@ func _on_log_hit(logg: Node, hit_direction: String):
 	# Logs will fall naturally due to physics!
 	# New logg will spawn automatically via timer to maintain MAX_LOGS count
 	
-	update_ui()
 
 func fly_log_to_basket(logg: Node, direction: String):
 	"""Animate logg flying to the appropriate basket"""

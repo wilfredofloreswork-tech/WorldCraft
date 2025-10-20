@@ -11,11 +11,18 @@ const GOOD_COLOR = Color(0.6, 0.4, 0.2)  # Brown
 const BAD_COLOR = Color(0.4, 0.2, 0.15)  # Deep red-brown
 
 func _ready():
-
-	# Physics settings - constrained but can fall
-	gravity_scale = 1.0
+	# Optimized physics settings
+	gravity_scale = 2.0  # Fall faster
 	lock_rotation = true  # Keep logs upright
 	freeze = false
+	
+	# Reduce physics complexity
+	continuous_cd = 0  # Disable continuous collision detection (not needed for logs)
+	contact_monitor = true
+	
+	# Add damping to reduce bouncing/jittering
+	linear_damp = 2.0  # Logs slow down quickly
+	angular_damp = 5.0
 	
 	# Connect collision detection
 	body_entered.connect(_on_body_entered)
@@ -48,8 +55,6 @@ func _on_body_entered(body):
 	"""Detect when axe hits this log"""
 	if already_hit:
 		return
-		
-	print("Body entered log: " + body.name)
 	
 	if body.name == "AxeHead" or "Axe" in body.name:
 		hit_by_axe(body)
@@ -65,18 +70,21 @@ func hit_by_axe(axe_node):
 	var hit_from_left = axe_node.global_position.x < global_position.x
 	var direction = "left" if hit_from_left else "right"
 	
-	print("Log hit from " + direction + " side")
 	
-	# Disable physics constraints for flying to basket
-	freeze = true
-	collision_layer = 0  # Stop colliding with other logs
-	collision_mask = 0
+	# DEFER physics changes to avoid state modification during collision callback
+	call_deferred("disable_physics")
 	
 	# Emit signal with direction
 	log_hit.emit(self, direction)
 	
 	# Visual feedback
 	flash_hit()
+
+func disable_physics():
+	"""Disable physics constraints - called deferred to avoid collision state issues"""
+	freeze = true
+	collision_layer = 0  # Stop colliding with other logs
+	collision_mask = 0
 
 func flash_hit():
 	"""Quick flash when hit"""

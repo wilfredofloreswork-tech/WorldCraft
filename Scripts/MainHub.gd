@@ -5,6 +5,7 @@ extends Node3D
 @onready var inventory_button = $HubUI/TopBar/HBoxContainer/MenuButtons/InventoryButton
 @onready var crafting_button = $HubUI/TopBar/HBoxContainer/MenuButtons/CraftingButton
 @onready var skills_button = $HubUI/TopBar/HBoxContainer/MenuButtons/SkillsButton
+@onready var equipment_button = $HubUI/TopBar/HBoxContainer/MenuButtons/EquipmentButton
 @onready var pets_button = $HubUI/TopBar/HBoxContainer/MenuButtons/PetsButton
 
 @onready var mining_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/MiningButton
@@ -23,6 +24,7 @@ var inventory_ui = null
 var crafting_ui = null
 var skills_ui = null
 var pets_ui = null
+var equipment_ui = null
 
 # Camera animation
 var camera_rotation = 0.0
@@ -32,6 +34,7 @@ func _ready():
 	print("\n=== MAIN HUB LOADED ===")
 	
 	# Connect UI buttons
+	equipment_button.pressed.connect(_on_equipment_pressed)
 	inventory_button.pressed.connect(_on_inventory_pressed)
 	crafting_button.pressed.connect(_on_crafting_pressed)
 	skills_button.pressed.connect(_on_skills_pressed)
@@ -93,6 +96,18 @@ func load_ui_scenes():
 		print("Skills UI loaded")
 	else:
 		print("WARNING: Could not load skills_ui.tscn")
+	# Load equipment UI
+	var equipment_scene = load("res://UI/equipment_ui.tscn")
+	if equipment_scene:
+		equipment_ui = equipment_scene.instantiate()
+		equipment_ui.visible = false
+		$HubUI.add_child(equipment_ui)
+		equipment_ui.equipment_closed.connect(_on_equipment_closed)
+		print("Equipment UI loaded")
+	else:
+		print("WARNING: Could not load equipment_ui.tscn")
+	
+	print("UI scenes loaded")
 	
 	# Pets UI will be added later
 	print("UI scenes loaded")
@@ -125,6 +140,16 @@ func _on_skills_pressed():
 	close_all_menus()
 	if skills_ui:
 		skills_ui.show_skills()
+
+func _on_equipment_pressed():
+	print("Opening equipment...")
+	close_all_menus()
+	if equipment_ui:
+		equipment_ui.show_equipment()
+
+func _on_equipment_closed():
+	print("Equipment closed")
+	update_player_info()
 
 func _on_pets_pressed():
 	print("Pets menu coming soon!")
@@ -166,19 +191,23 @@ func close_all_menus():
 		crafting_ui.hide_crafting()
 	if skills_ui and skills_ui.visible:
 		skills_ui.hide_skills()
+	if equipment_ui and equipment_ui.visible:
+		equipment_ui.hide_equipment()
 
 # ===== INPUT HANDLING =====
 
 func _unhandled_input(event):
 	# Quick access shortcuts
 	if event.is_action_pressed("ui_cancel"):
-		# Close any open menus, or show quit dialog
+		# Close any open menus
 		if inventory_ui and inventory_ui.visible:
 			inventory_ui.hide_inventory()
 		elif crafting_ui and crafting_ui.visible:
 			crafting_ui.hide_crafting()
 		elif skills_ui and skills_ui.visible:
 			skills_ui.hide_skills()
+		elif equipment_ui and equipment_ui.visible:
+			equipment_ui.hide_equipment()
 		else:
 			# Could show a "quit game?" dialog here
 			pass

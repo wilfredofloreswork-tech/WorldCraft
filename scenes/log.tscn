@@ -1,28 +1,36 @@
-[gd_scene load_steps=4 format=3 uid="uid://blogscene123"]
+[gd_scene load_steps=5 format=3 uid="uid://blogscene123"]
 
 [ext_resource type="Script" uid="uid://cpfeccg7op4wn" path="res://Scripts/log.gd" id="1_spugk"]
+[ext_resource type="Texture2D" uid="uid://bhckp1ai0npne" path="res://sprites/log_cropped.png" id="2_pt1ea"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_spugk"]
+rough = true
+absorbent = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_log"]
 size = Vector2(120, 60)
 
 [node name="Log" type="RigidBody2D"]
-collision_layer = 4
-collision_mask = 30
+collision_layer = 8
+collision_mask = 26
+mass = 80.0
 physics_material_override = SubResource("PhysicsMaterial_spugk")
 gravity_scale = 3.0
+center_of_mass_mode = 1
+center_of_mass = Vector2(0, 500)
 lock_rotation = true
 contact_monitor = true
 max_contacts_reported = 8
+linear_damp_mode = 1
+linear_damp = -1.0
 script = ExtResource("1_spugk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_log")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="TextureRect" parent="."]
 offset_left = -60.0
 offset_top = -30.0
 offset_right = 60.0
 offset_bottom = 30.0
-color = Color(0.6, 0.4, 0.2, 1)
+texture = ExtResource("2_pt1ea")

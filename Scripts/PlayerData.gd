@@ -85,7 +85,7 @@ func add_xp(skill_name: String, amount: int):
 		return
 	
 	var skill = player_data["skills"][skill_name]
-	var old_level = skill["level"]
+	var _old_level = skill["level"]
 	
 	# Add XP
 	skill["xp"] += amount

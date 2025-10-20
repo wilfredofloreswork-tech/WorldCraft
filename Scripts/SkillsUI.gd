@@ -266,7 +266,7 @@ func _on_level_up(skill_name: String, new_level: int):
 		refresh_skills()
 		show_level_up_animation(skill_name, new_level)
 
-func _on_xp_gained(skill_name: String, amount: int, new_total: int):
+func _on_xp_gained(_skill_name: String, _amount: int, _new_total: int):
 	# Refresh if visible
 	if visible:
 		refresh_skills()

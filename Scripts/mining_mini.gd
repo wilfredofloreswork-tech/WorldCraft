@@ -33,8 +33,7 @@ var time_remaining := 0.0
 func _ready():
 	# DEBUG: Check if ore type was set
 	print("\n=== MINIGAME STARTING ===")
-	print("Current ore type: " + str(current_ore_type))
-	print("Current ore name: " + current_ore_name)
+
 	
 	# TESTING: Set ore type here if running minigame directly
 	# Comment this out when launching from world map
@@ -68,8 +67,6 @@ func _ready():
 	apply_equipment_bonus()
 	
 	update_ui()
-	print("Mining " + current_ore_name + "! Combo multiplier active!")
-	print("Break ores quickly to build combo!")
 
 func set_ore_type(ore_type: int, ore_name: String):
 	"""Call this before starting the minigame to set what ore type to mine"""
@@ -209,7 +206,6 @@ func _on_ore_destroyed(ore_type: String):
 	# Show combo feedback
 	show_combo_popup(ores_gained)
 	
-	print("Destroyed ore! Combo: x" + str(combo_count) + " (%.1fx multiplier) - Gained %d ores" % [combo_multiplier, ores_gained])
 	
 	update_ui()
 

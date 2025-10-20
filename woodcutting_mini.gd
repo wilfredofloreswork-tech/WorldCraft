@@ -119,12 +119,9 @@ func spawn_log():
 	
 	# Connect signal
 	new_log.log_hit.connect(_on_log_hit)
-	
-	print("Spawned " + ("GOOD" if is_good else "BAD") + " logg")
 
 func _on_log_hit(logg: Node, hit_direction: String):
 	"""Called when axe hits a logg with direction info"""
-	print("logg hit! Direction: " + hit_direction + ", Is Good: " + str(logg.is_good_log))
 	
 	# Check if sorting is correct
 	var correct = false
@@ -140,11 +137,11 @@ func _on_log_hit(logg: Node, hit_direction: String):
 	if correct:
 		correct_sorts += 1
 		score += 10
-		show_feedback("Good! +10", Color.GREEN)
+		#show_feedback("Good! +10", Color.GREEN)
 	else:
 		wrong_sorts += 1
 		score = max(0, score - 5)  # Don't go negative
-		show_feedback("Wrong! -5", Color.RED)
+		#show_feedback("Wrong! -5", Color.RED)
 	
 	# Remove logg from stack
 	log_stack.erase(logg)

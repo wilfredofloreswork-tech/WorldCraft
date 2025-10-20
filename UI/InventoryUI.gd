@@ -289,13 +289,6 @@ func get_equipment_slot_for_item(item_name: String) -> String:
 func get_item_category(item_name: String) -> String:
 	return ItemDatabase.get_item_category(item_name)
 	
-	# Fallback category detection
-	if "ore" in item_name or "coal" in item_name:
-		return "ore"
-	elif "pickaxe" in item_name or "axe" in item_name or "rod" in item_name:
-		return "tool"
-	else:
-		return "misc"
 
 func get_item_display_name(item_name: String) -> String:
 	return ItemDatabase.get_item_display_name(item_name)

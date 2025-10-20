@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://dgos7modwwbha"]
+[gd_scene load_steps=12 format=3 uid="uid://dgos7modwwbha"]
 
 [ext_resource type="Script" uid="uid://dent2pc2ayjg0" path="res://Scripts/woodcutting_mini.gd" id="1_scdf3"]
+[ext_resource type="Texture2D" uid="uid://td0g2h2ifw4q" path="res://sprites/ChatGPT Image Oct 20, 2025, 01_22_31 AM (1).png" id="2_h1anq"]
 [ext_resource type="Script" uid="uid://dnh02iqpdqn4e" path="res://Scripts/axe.gd" id="2_scdf3"]
 [ext_resource type="Texture2D" uid="uid://deb1hfsuhkilf" path="res://sprites/axe-removebg-preview.png" id="3_scdf3"]
+[ext_resource type="Texture2D" uid="uid://c1414o4vwrex" path="res://sprites/stump.png" id="5_w7rs2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_h1anq"]
 
@@ -20,7 +22,7 @@ absorbent = true
 bounce = 1.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ktdxi"]
-size = Vector2(69, 104)
+size = Vector2(103.5, 103)
 
 [node name="WoodcuttingMini" type="Node2D"]
 script = ExtResource("1_scdf3")
@@ -28,10 +30,10 @@ script = ExtResource("1_scdf3")
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(240, 360)
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 offset_right = 480.0
 offset_bottom = 720.0
-color = Color(0.2, 0.3, 0.2, 1)
+texture = ExtResource("2_h1anq")
 
 [node name="LogContainer" type="Node2D" parent="."]
 
@@ -86,7 +88,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LogSpawnTimer" type="Timer" parent="."]
-wait_time = 0.5
+wait_time = 0.1
 autostart = true
 
 [node name="UI" type="CanvasLayer" parent="."]
@@ -118,6 +120,13 @@ theme_override_font_sizes/font_size = 32
 text = "Good! +10"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="stump?" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.647059, 0.52549, 0.262745, 1)
+position = Vector2(236.25, 484)
+scale = Vector2(1.49583, 1.35507)
+texture = ExtResource("5_w7rs2")
 
 [node name="Axe" type="Node2D" parent="."]
 position = Vector2(240, 600)
@@ -156,7 +165,7 @@ node_b = NodePath("../AxeHead")
 [node name="RigidBody2D" type="RigidBody2D" parent="."]
 disable_mode = 2
 collision_layer = 16
-collision_mask = 31
+collision_mask = 287
 physics_material_override = SubResource("PhysicsMaterial_scdf3")
 gravity_scale = 0.0
 can_sleep = false
@@ -169,9 +178,9 @@ angular_damp_mode = 1
 angular_damp = 100.0
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="RigidBody2D"]
-position = Vector2(148, 418)
+position = Vector2(147, 437)
 build_mode = 1
-polygon = PackedVector2Array(29, -800, 150, -800, 150, 0, 29, 0)
+polygon = PackedVector2Array(29, -499, 150, -499, 150, 0, 29, 0)
 
 [node name="RigidBody2D2" type="RigidBody2D" parent="."]
 collision_layer = 128
@@ -184,5 +193,5 @@ freeze = true
 freeze_mode = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D2"]
-position = Vector2(238, 405)
+position = Vector2(235, 437)
 shape = SubResource("RectangleShape2D_ktdxi")

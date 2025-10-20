@@ -43,7 +43,7 @@ func get_item(item_id: String) -> Dictionary:
 	return {}
 
 func get_item_display_name(item_id: String) -> String:
-	"""Get the display name for an item"""
+	"""Get the display item_name for an item"""
 	var item = get_item(item_id)
 	if item.has("display_name"):
 		return item["display_name"]
@@ -175,8 +175,8 @@ func format_requirements(recipe_id: String) -> String:
 	var parts = []
 	for item_id in recipe["requires"].keys():
 		var amount = recipe["requires"][item_id]
-		var name = get_item_display_name(item_id)
-		parts.append("%s x%d" % [name, amount])
+		var item_name = get_item_display_name(item_id)
+		parts.append("%s x%d" % [item_name, amount])
 	
 	return ", ".join(parts)
 

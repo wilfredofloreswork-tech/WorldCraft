@@ -52,7 +52,3 @@ craft_button={
 [physics]
 
 jolt_physics_3d/collisions/collision_margin_fraction=1.0
-
-[rendering]
-
-renderer/rendering_method="mobile"

@@ -90,9 +90,7 @@ func apply_ore_properties():
 	
 	if sprite:
 		sprite.modulate = data["color"]
-		print("Applied color to sprite: " + data["name"] + " - Color: " + str(data["color"]))
-	else:
-		print("WARNING: No sprite found to color!")
+
 	
 	# Update health bar if it exists
 	if health_bar:
@@ -121,7 +119,6 @@ func create_health_bar():
 
 func _on_body_entered(body):
 	# Only take damage from the pickaxe
-	print("Body entered ore: " + body.name)
 	if body.name == "RigidBody2D":
 		# Calculate damage based on pickaxe velocity
 		var impact_force = body.linear_velocity.length()
@@ -158,7 +155,6 @@ func take_damage(impact_force: float):
 	
 	# Check if destroyed
 	if current_health <= 0:
-		print("ORE HEALTH DEPLETED - DESTROYING")
 		destroy_ore()
 
 func flash_damage():
@@ -199,7 +195,6 @@ func shake_ore(intensity: float):
 func destroy_ore():
 	# Emit destroyed signal FIRST before doing anything else
 	var data = ore_data[ore_type]
-	print("ORE DESTROYED: " + data["name"])
 	destroyed.emit(data["name"])
 	
 	# Create destruction effect
