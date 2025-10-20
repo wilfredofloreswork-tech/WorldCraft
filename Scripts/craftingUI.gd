@@ -49,11 +49,11 @@ func refresh_recipes():
 		child.queue_free()
 	
 	# Get all recipes
-	var all_recipes = PlayerData.get_all_recipes()
+	var all_recipes = ItemDatabase.get_all_recipes()
 	
 	# Create button for each recipe
 	for recipe_name in all_recipes:
-		var recipe = PlayerData.recipes[recipe_name]
+		var recipe = ItemDatabase.get_recipe(recipe_name)
 		
 		# Create recipe button
 		var button = Button.new()
@@ -64,7 +64,7 @@ func refresh_recipes():
 		var meets_skills = PlayerData.meets_skill_requirements(recipe_name)
 		
 		# Button text with status
-		var item_display_name = recipe["produces"].replace("_", " ").capitalize()
+		var item_display_name = ItemDatabase.get_item_display_name(recipe["produces"])
 		if can_craft:
 			button.text = "✓ " + item_display_name
 			button.modulate = Color(0.8, 1.0, 0.8)  # Green tint
@@ -95,18 +95,18 @@ func display_recipe_details(recipe_name: String):
 	for child in recipe_details.get_children():
 		child.queue_free()
 	
-	var recipe = PlayerData.recipes[recipe_name]
+	var recipe = ItemDatabase.get_recipe(recipe_name)
 	
 	# Title
 	var title = Label.new()
-	title.text = recipe["produces"].replace("_", " ").capitalize()
+	title.text = ItemDatabase.get_item_display_name(recipe["produces"])
 	title.add_theme_font_size_override("font_size", 24)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	recipe_details.add_child(title)
 	
 	# Description
 	var desc = Label.new()
-	desc.text = recipe["description"]
+	desc.text = ItemDatabase.get_item_description(recipe["produces"])
 	desc.add_theme_font_size_override("font_size", 14)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
 	recipe_details.add_child(desc)
@@ -122,24 +122,25 @@ func display_recipe_details(recipe_name: String):
 	materials_label.add_theme_font_size_override("font_size", 16)
 	recipe_details.add_child(materials_label)
 	
-	for material in recipe["requires"]:
-		var needed = recipe["requires"][material]
-		var have = PlayerData.get_item_count(material)
-		
-		var mat_label = Label.new()
-		var material_name = material.replace("_", " ").capitalize()
-		mat_label.text = "  • " + material_name + ": " + str(have) + "/" + str(needed)
-		
-		# Color based on if we have enough
-		if have >= needed:
-			mat_label.modulate = Color(0.5, 1.0, 0.5)  # Green
-		else:
-			mat_label.modulate = Color(1.0, 0.5, 0.5)  # Red
-		
-		recipe_details.add_child(mat_label)
+	if recipe.has("requires"):
+		for material in recipe["requires"]:
+			var needed = recipe["requires"][material]
+			var have = PlayerData.get_item_count(material)
+			
+			var mat_label = Label.new()
+			var material_name = ItemDatabase.get_item_display_name(material)
+			mat_label.text = "  • " + material_name + ": " + str(have) + "/" + str(needed)
+			
+			# Color based on if we have enough
+			if have >= needed:
+				mat_label.modulate = Color(0.5, 1.0, 0.5)  # Green
+			else:
+				mat_label.modulate = Color(1.0, 0.5, 0.5)  # Red
+			
+			recipe_details.add_child(mat_label)
 	
 	# Skill requirements
-	if recipe["skill_required"].size() > 0:
+	if recipe.has("skill_required") and recipe["skill_required"].size() > 0:
 		var spacer2 = Control.new()
 		spacer2.custom_minimum_size = Vector2(0, 10)
 		recipe_details.add_child(spacer2)

@@ -78,28 +78,18 @@ func set_ore_type(ore_type: int, ore_name: String):
 
 func apply_equipment_bonus():
 	var equipped_pickaxe = PlayerData.get_equipped_item("pickaxe")
-	
-	match equipped_pickaxe:
-		"bronze_pickaxe":
-			game_duration += 1.0
-			time_remaining += 1.0
-		"iron_pickaxe":
-			game_duration += 2.0
-			time_remaining += 2.0
-		"steel_pickaxe":
-			game_duration += 3.0
-			time_remaining += 3.0
-		"mithril_pickaxe":
-			game_duration += 5.0
-			time_remaining += 5.0
-'''
+	if equipped_pickaxe:
+		var bonus_time = ItemDatabase.get_bonus_time(equipped_pickaxe)
+		game_duration += bonus_time
+		time_remaining += bonus_time
+		print("Equipped: %s (+%.1fs)" % [equipped_pickaxe, bonus_time])
 func _on_crafting_button_pressed():
 	if Input.is_action_just_pressed("craft_button"):
 		var crafting_scene = load("res://UI/crafting_ui.tscn")
 		var crafting_ui = crafting_scene.instantiate()
 		add_child(crafting_ui)
 		crafting_ui.show_crafting()
-'''
+
 
 func _process(delta):
 #	_on_crafting_button_pressed()
@@ -275,14 +265,7 @@ func end_minigame():
 	show_results_screen(total_xp)
 
 func get_base_xp_for_ore(ore_name: String) -> int:
-	match ore_name:
-		"copper_ore": return 10
-		"tin_ore": return 12
-		"iron_ore": return 25
-		"coal": return 30
-		"gold_ore": return 50
-		"mithril_ore": return 100
-		_: return 10
+	return ItemDatabase.get_base_xp(ore_name)
 
 func show_results_screen(total_xp: int):
 	print("\n=== PREPARING RESULTS SCREEN ===")

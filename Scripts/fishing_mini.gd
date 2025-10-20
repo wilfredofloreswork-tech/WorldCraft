@@ -103,24 +103,13 @@ func set_fish_type(fish_type: String, fish_name: String):
 
 func apply_equipment_bonus():
 	var equipped_rod = PlayerData.get_equipped_item("fishing_rod")
-	
-	match equipped_rod:
-		"basic_rod":
-			game_duration += 5.0
-			time_remaining += 5.0
-			bar_size += 0.02
-		"good_rod":
-			game_duration += 10.0
-			time_remaining += 10.0
-			bar_size += 0.04
-		"great_rod":
-			game_duration += 15.0
-			time_remaining += 15.0
-			bar_size += 0.06
-		"master_rod":
-			game_duration += 20.0
-			time_remaining += 20.0
-			bar_size += 0.08
+	if equipped_rod:
+		var bonus_time = ItemDatabase.get_bonus_time(equipped_rod)
+		var bar_bonus = ItemDatabase.get_bar_size_bonus(equipped_rod)
+		game_duration += bonus_time
+		time_remaining += bonus_time
+		bar_size += bar_bonus
+		print("Equipped: %s (+%.1fs, +%.2f bar)" % [equipped_rod, bonus_time, bar_bonus])
 	
 	# Clamp bar size
 	bar_size = clamp(bar_size, 0.1, 0.4)
@@ -348,12 +337,7 @@ func end_minigame():
 	show_results_screen(total_xp)
 
 func get_base_xp_for_fish(fish_type: String) -> int:
-	match fish_type:
-		"raw_fish": return 15
-		"salmon": return 30
-		"tuna": return 50
-		"lobster": return 80
-		_: return 15
+	return ItemDatabase.get_base_xp(fish_type)
 
 func show_results_screen(total_xp: int):
 	var results_scene = preload("res://UI/results_screen.tscn")

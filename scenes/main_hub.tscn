@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://dqtulre612u6"]
 
-[ext_resource type="Script" uid="uid://0bmuk3g0bco2" path="res://scenes/MainHub.gd" id="1_oa6wl"]
+[ext_resource type="Script" uid="uid://c612yxomaykke" path="res://Scripts/MainHub.gd" id="1_7v7ny"]
 [ext_resource type="Texture2D" uid="uid://bra1xaslimjb1" path="res://sprites/rossypoo.png" id="2_7v7ny"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
@@ -36,7 +36,7 @@ albedo_texture = ExtResource("2_7v7ny")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e8wc2"]
 
 [node name="MainHub" type="Node3D"]
-script = ExtResource("1_oa6wl")
+script = ExtResource("1_7v7ny")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_hub")

@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://dgos7modwwbha"]
 
-[ext_resource type="Script" uid="uid://bo3xuur1nfmo2" path="res://woodcutting_mini.gd" id="1_ogem5"]
-[ext_resource type="Script" uid="uid://g0lhtjifmmpt" path="res://scenes/axe.gd" id="2_mdt7r"]
+[ext_resource type="Script" uid="uid://dent2pc2ayjg0" path="res://Scripts/woodcutting_mini.gd" id="1_scdf3"]
+[ext_resource type="Script" uid="uid://dnh02iqpdqn4e" path="res://Scripts/axe.gd" id="2_scdf3"]
 [ext_resource type="Texture2D" uid="uid://deb1hfsuhkilf" path="res://sprites/axe-removebg-preview.png" id="3_scdf3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_h1anq"]
@@ -23,7 +23,7 @@ bounce = 1.0
 size = Vector2(69, 104)
 
 [node name="WoodcuttingMini" type="Node2D"]
-script = ExtResource("1_ogem5")
+script = ExtResource("1_scdf3")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(240, 360)
@@ -121,7 +121,7 @@ vertical_alignment = 1
 
 [node name="Axe" type="Node2D" parent="."]
 position = Vector2(240, 600)
-script = ExtResource("2_mdt7r")
+script = ExtResource("2_scdf3")
 
 [node name="Handlepoint" type="RigidBody2D" parent="Axe"]
 position = Vector2(-3, -75)

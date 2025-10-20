@@ -155,175 +155,74 @@ func get_skill_progress(skill_name: String) -> float:
 	return float(xp_in_level) / float(xp_needed)
 # ===== CRAFTING SYSTEM =====
 
-# Recipe database - defines all craftable items
-var recipes = {
-	# Pickaxes
-	"bronze_pickaxe": {
-		"requires": {"copper_ore": 1, "tin_ore": 1},
-		"skill_required": {"smithing": 1},
-		"produces": "bronze_pickaxe",
-		"xp_granted": {"smithing": 12.5},
-		"category": "pickaxe",
-		"description": "A basic pickaxe. +1s mining time"
-	},
-	"iron_pickaxe": {
-		"requires": {"iron_ore": 3},
-		"skill_required": {"smithing": 15},
-		"produces": "iron_pickaxe",
-		"xp_granted": {"smithing": 25},
-		"category": "pickaxe",
-		"description": "Sturdy iron pickaxe. +2s mining time"
-	},
-	"steel_pickaxe": {
-		"requires": {"iron_ore": 2, "coal": 2},
-		"skill_required": {"smithing": 30},
-		"produces": "steel_pickaxe",
-		"xp_granted": {"smithing": 50},
-		"category": "pickaxe",
-		"description": "Strong steel pickaxe. +3s mining time"
-	},
-	"mithril_pickaxe": {
-		"requires": {"mithril_ore": 4, "coal": 4},
-		"skill_required": {"smithing": 50},
-		"produces": "mithril_pickaxe",
-		"xp_granted": {"smithing": 120},
-		"category": "pickaxe",
-		"description": "Legendary pickaxe. +5s mining time"
-	},
-		# Axes
-	"bronze_axe": {
-		"requires": {"copper_ore": 1, "tin_ore": 1},
-		"skill_required": {"smithing": 1},
-		"produces": "bronze_axe",
-		"xp_granted": {"smithing": 12.5},
-		"category": "tool",
-		"description": "A basic axe. +5s woodcutting time"
-	},
-	"iron_axe": {
-		"requires": {"iron_ore": 3},
-		"skill_required": {"smithing": 15},
-		"produces": "iron_axe",
-		"xp_granted": {"smithing": 25},
-		"category": "tool",
-		"description": "Sturdy iron axe. +10s woodcutting time"
-	},
-	"steel_axe": {
-		"requires": {"iron_ore": 2, "coal": 2},
-		"skill_required": {"smithing": 30},
-		"produces": "steel_axe",
-		"xp_granted": {"smithing": 50},
-		"category": "tool",
-		"description": "Strong steel axe. +15s woodcutting time"
-	},
-	"mithril_axe": {
-		"requires": {"mithril_ore": 4, "coal": 4},
-		"skill_required": {"smithing": 50},
-		"produces": "mithril_axe",
-		"xp_granted": {"smithing": 120},
-		"category": "tool",
-		"description": "Legendary axe. +25s woodcutting time"
-	},
-	"basic_rod": {
-	"requires": {"oak_log": 5},
-	"skill_required": {"woodcutting": 5},
-	"produces": "basic_rod",
-	"xp_granted": {"woodcutting": 15},
-	"category": "tool",
-	"description": "Simple fishing rod. +5s fishing time"
-},
-"good_rod": {
-	"requires": {"oak_log": 10, "iron_ore": 2},
-	"skill_required": {"woodcutting": 15, "smithing": 10},
-	"produces": "good_rod",
-	"xp_granted": {"woodcutting": 30, "smithing": 20},
-	"category": "tool",
-	"description": "Quality fishing rod. +10s fishing time, larger catch bar"
-},
-"great_rod": {
-	"requires": {"oak_log": 15, "steel_pickaxe": 1},
-	"skill_required": {"woodcutting": 30, "smithing": 25},
-	"produces": "great_rod",
-	"xp_granted": {"woodcutting": 60, "smithing": 40},
-	"category": "tool",
-	"description": "Great fishing rod. +15s fishing time, larger catch bar"
-},
-"master_rod": {
-	"requires": {"oak_log": 25, "mithril_ore": 5, "gold_ore": 3},
-	"skill_required": {"woodcutting": 50, "smithing": 50, "fishing": 40},
-	"produces": "master_rod",
-	"xp_granted": {"woodcutting": 150, "smithing": 100},
-	"category": "tool",
-	"description": "Master fishing rod. +20s fishing time, much larger catch bar"
-}
-}
-
 # ===== CRAFTING FUNCTIONS =====
 
-# Check if player can craft a recipe
 func can_craft(recipe_name: String) -> bool:
-	if not recipes.has(recipe_name):
+	var recipe = ItemDatabase.get_recipe(recipe_name)
+	if recipe.is_empty():
 		return false
 	
-	var recipe = recipes[recipe_name]
-	
 	# Check materials
-	for material in recipe["requires"]:
-		if not has_item(material, recipe["requires"][material]):
-			return false
+	if recipe.has("requires"):
+		for material in recipe["requires"]:
+			if not has_item(material, recipe["requires"][material]):
+				return false
 	
 	# Check skill levels
-	for skill in recipe["skill_required"]:
-		if get_skill_level(skill) < recipe["skill_required"][skill]:
-			return false
+	if recipe.has("skill_required"):
+		for skill in recipe["skill_required"]:
+			if get_skill_level(skill) < recipe["skill_required"][skill]:
+				return false
 	
 	return true
 
-# Get list of missing materials for a recipe
 func get_missing_materials(recipe_name: String) -> Dictionary:
-	if not recipes.has(recipe_name):
+	var recipe = ItemDatabase.get_recipe(recipe_name)
+	if recipe.is_empty():
 		return {}
 	
-	var recipe = recipes[recipe_name]
 	var missing = {}
 	
-	for material in recipe["requires"]:
-		var needed = recipe["requires"][material]
-		var have = get_item_count(material)
-		if have < needed:
-			missing[material] = needed - have
+	if recipe.has("requires"):
+		for material in recipe["requires"]:
+			var needed = recipe["requires"][material]
+			var have = get_item_count(material)
+			if have < needed:
+				missing[material] = needed - have
 	
 	return missing
 
-# Check if player meets skill requirements
 func meets_skill_requirements(recipe_name: String) -> bool:
-	if not recipes.has(recipe_name):
+	var recipe = ItemDatabase.get_recipe(recipe_name)
+	if recipe.is_empty():
 		return false
 	
-	var recipe = recipes[recipe_name]
-	for skill in recipe["skill_required"]:
-		if get_skill_level(skill) < recipe["skill_required"][skill]:
-			return false
+	if recipe.has("skill_required"):
+		for skill in recipe["skill_required"]:
+			if get_skill_level(skill) < recipe["skill_required"][skill]:
+				return false
 	
 	return true
 
-# Craft an item
 func craft_item(recipe_name: String) -> bool:
 	if not can_craft(recipe_name):
 		print("Cannot craft " + recipe_name + " - requirements not met")
 		return false
 	
-	var recipe = recipes[recipe_name]
+	var recipe = ItemDatabase.get_recipe(recipe_name)
 	
 	# Consume materials
-	for material in recipe["requires"]:
-		remove_item(material, recipe["requires"][material])
+	if recipe.has("requires"):
+		for material in recipe["requires"]:
+			remove_item(material, recipe["requires"][material])
 	
 	# Create item
 	add_item(recipe["produces"], 1)
 	
 	# Grant XP
-	for skill in recipe["xp_granted"]:
-		add_xp(skill, int(recipe["xp_granted"][skill]))
+	if recipe.has("xp_granted"):
+		for skill in recipe["xp_granted"]:
+			add_xp(skill, int(recipe["xp_granted"][skill]))
 	
 	# Update statistics
 	increment_stat("items_crafted", 1)
@@ -331,26 +230,18 @@ func craft_item(recipe_name: String) -> bool:
 	print("Crafted: " + recipe["produces"])
 	return true
 
-# Get all recipes player can currently craft
 func get_craftable_recipes() -> Array:
 	var craftable = []
-	for recipe_name in recipes:
+	for recipe_name in ItemDatabase.get_all_recipes():
 		if can_craft(recipe_name):
 			craftable.append(recipe_name)
 	return craftable
 
-# Get recipes by category
 func get_recipes_by_category(category: String) -> Array:
-	var filtered = []
-	for recipe_name in recipes:
-		if recipes[recipe_name]["category"] == category:
-			filtered.append(recipe_name)
-	return filtered
+	return ItemDatabase.get_recipes_by_category(category)
 
-# Get all recipe names
 func get_all_recipes() -> Array:
-	return recipes.keys()
-	
+	return ItemDatabase.get_all_recipes()
 
 # ===== INVENTORY FUNCTIONS =====
 

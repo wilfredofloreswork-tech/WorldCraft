@@ -15,7 +15,7 @@ var current_log_type = "oak_log"
 var time_remaining := 0.0
 
 # References
-@onready var log_scene = preload("res://Scripts/log.gd")
+@onready var log_scene = preload("res://scenes/log.tscn")
 @onready var spawn_timer = $LogSpawnTimer
 @onready var log_container = $LogContainer
 @onready var axe = $Axe if has_node("Axe") else null

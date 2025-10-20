@@ -15,37 +15,6 @@ signal item_selected(item_name: String)
 var selected_item = null
 var current_category = "all"
 
-# Item categories and display info
-var item_info = {
-	# Ores
-	"copper_ore": {"category": "ore", "display_name": "Copper Ore", "description": "Basic copper ore. Used in bronze crafting.", "color": Color(0.72, 0.45, 0.20)},
-	"tin_ore": {"category": "ore", "display_name": "Tin Ore", "description": "Tin ore. Combined with copper to make bronze.", "color": Color(0.7, 0.7, 0.75)},
-	"iron_ore": {"category": "ore", "display_name": "Iron Ore", "description": "Strong iron ore. Used in steel crafting.", "color": Color(0.5, 0.5, 0.55)},
-	"coal": {"category": "ore", "display_name": "Coal", "description": "Fuel for smelting. Required for steel.", "color": Color(0.15, 0.15, 0.15)},
-	"gold_ore": {"category": "ore", "display_name": "Gold Ore", "description": "Precious gold ore. Rare and valuable.", "color": Color(1.0, 0.84, 0.0)},
-	"mithril_ore": {"category": "ore", "display_name": "Mithril Ore", "description": "Legendary mithril ore. Extremely rare.", "color": Color(0.5, 0.8, 1.0)},
-	
-	# Tools - Pickaxes
-	"bronze_pickaxe": {"category": "tool", "display_name": "Bronze Pickaxe", "description": "Basic pickaxe. +1s mining time.", "color": Color(0.8, 0.5, 0.2)},
-	"iron_pickaxe": {"category": "tool", "display_name": "Iron Pickaxe", "description": "Sturdy iron pickaxe. +2s mining time.", "color": Color(0.6, 0.6, 0.65)},
-	"steel_pickaxe": {"category": "tool", "display_name": "Steel Pickaxe", "description": "Strong steel pickaxe. +3s mining time.", "color": Color(0.7, 0.7, 0.75)},
-	"mithril_pickaxe": {"category": "tool", "display_name": "Mithril Pickaxe", "description": "Legendary pickaxe. +5s mining time.", "color": Color(0.6, 0.9, 1.0)},
-	
-	# Tools - Axes
-	"bronze_axe": {"category": "tool", "display_name": "Bronze Axe", "description": "Basic axe. +5s woodcutting time.", "color": Color(0.8, 0.5, 0.2)},
-	"iron_axe": {"category": "tool", "display_name": "Iron Axe", "description": "Sturdy iron axe. +10s woodcutting time.", "color": Color(0.6, 0.6, 0.65)},
-	"steel_axe": {"category": "tool", "display_name": "Steel Axe", "description": "Strong steel axe. +15s woodcutting time.", "color": Color(0.7, 0.7, 0.75)},
-	"mithril_axe": {"category": "tool", "display_name": "Mithril Axe", "description": "Legendary axe. +25s woodcutting time.", "color": Color(0.6, 0.9, 1.0)},
-	
-	# Logs
-	"oak_log": {"category": "resource", "display_name": "Oak Log", "description": "Basic oak logs for woodworking.", "color": Color(0.6, 0.4, 0.2)},
-	
-	"raw_fish": {"category": "resource", "display_name": "Raw Fish", "description": "Common fish. Can be cooked.", "color": Color(0.7, 0.7, 0.8)},
-	"salmon": {"category": "resource", "display_name": "Salmon", "description": "Quality fish. Harder to catch.", "color": Color(1.0, 0.6, 0.5)},
-	"tuna": {"category": "resource", "display_name": "Tuna", "description": "Large fish. Very challenging.", "color": Color(0.4, 0.5, 0.8)},
-	"lobster": {"category": "resource", "display_name": "Lobster", "description": "Rare crustacean. Extremely difficult.", "color": Color(0.9, 0.3, 0.2)},
-}
-
 func _ready():
 	visible = false
 	
@@ -69,7 +38,7 @@ func setup_categories():
 		child.queue_free()
 	
 	# Create category filter buttons
-	var categories = ["all", "ore", "tool", "equipment"]
+	var categories = ["all", "resource", "tool", "equipment"]
 	
 	for cat in categories:
 		var button = Button.new()
@@ -275,11 +244,7 @@ func display_item_details(item_name: String):
 
 func show_crafting_uses(item_name: String):
 	# Find recipes that use this item
-	var uses = []
-	for recipe_name in PlayerData.recipes.keys():
-		var recipe = PlayerData.recipes[recipe_name]
-		if recipe["requires"].has(item_name):
-			uses.append(recipe_name)
+	var uses = ItemDatabase.get_recipes_using_item(item_name)
 	
 	if uses.size() > 0:
 		var spacer = Control.new()
@@ -294,7 +259,7 @@ func show_crafting_uses(item_name: String):
 		
 		for recipe_name in uses:
 			var recipe_label = Label.new()
-			recipe_label.text = "  • " + recipe_name.replace("_", " ").capitalize()
+			recipe_label.text = "  • " + ItemDatabase.get_item_display_name(recipe_name)
 			recipe_label.add_theme_font_size_override("font_size", 12)
 			recipe_label.modulate = Color(0.7, 0.7, 0.9)
 			item_details.add_child(recipe_label)
@@ -319,20 +284,10 @@ func _on_unequip_item(slot: String):
 		refresh_inventory()
 
 func get_equipment_slot_for_item(item_name: String) -> String:
-	if "pickaxe" in item_name:
-		return "pickaxe"
-	elif "axe" in item_name and "pickaxe" not in item_name:
-		return "axe"
-	elif "rod" in item_name:
-		return "fishing_rod"
-	elif "armor" in item_name:
-		return "armor"
-	else:
-		return "accessory"
+	return ItemDatabase.get_equipment_slot(item_name)
 
 func get_item_category(item_name: String) -> String:
-	if item_info.has(item_name):
-		return item_info[item_name]["category"]
+	return ItemDatabase.get_item_category(item_name)
 	
 	# Fallback category detection
 	if "ore" in item_name or "coal" in item_name:
@@ -343,19 +298,13 @@ func get_item_category(item_name: String) -> String:
 		return "misc"
 
 func get_item_display_name(item_name: String) -> String:
-	if item_info.has(item_name):
-		return item_info[item_name]["display_name"]
-	return item_name.replace("_", " ").capitalize()
+	return ItemDatabase.get_item_display_name(item_name)
 
 func get_item_description(item_name: String) -> String:
-	if item_info.has(item_name):
-		return item_info[item_name]["description"]
-	return "A valuable item."
+	return ItemDatabase.get_item_description(item_name)
 
 func get_item_color(item_name: String) -> Color:
-	if item_info.has(item_name):
-		return item_info[item_name]["color"]
-	return Color(0.7, 0.7, 0.7)
+	return ItemDatabase.get_item_color(item_name)
 
 func _on_item_changed(_item_name: String, _amount: int):
 	# Refresh inventory when items are added/removed
