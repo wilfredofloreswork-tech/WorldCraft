@@ -264,7 +264,7 @@ func show_results_screen(total_xp: int):
 	add_child(results)
 	
 	var items_dict = {current_log_type: correct_sorts}
-	results.show_results(total_xp, items_dict)
+	results.show_results(total_xp, items_dict, "🪓 Woodcutting Complete!")
 	results.continue_pressed.connect(return_to_hub)
 
 func return_to_hub():

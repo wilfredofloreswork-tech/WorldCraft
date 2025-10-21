@@ -13,8 +13,8 @@ const COMBO_TIMEOUT = 2.0
 var combo_multiplier := 1.0
 
 # Ore type for this session
-var current_ore_type = 0
-var current_ore_name = "copper_ore"
+var current_ore_type = 5
+var current_ore_name = "mithril_ore"
 
 # Time settings
 @export var game_duration := 5.0
@@ -47,8 +47,7 @@ func _ready():
 	else:
 		print("WARNING: spawn_locations not found!")
 	
-	# TESTING: Set ore type here if running minigame directly
-	set_ore_type(2, "iron_ore")
+
 	
 	# Initialize time
 	time_remaining = game_duration
@@ -183,10 +182,10 @@ func _on_timer_timeout() -> void:
 		spawn_ore(get_random_spawn_position())
 		
 		# Spawn faster as time runs out
-		if time_remaining < 2.0 and spawn_timer.wait_time > 0.15:
-			spawn_timer.wait_time = 0.15
-		elif time_remaining < 3.5 and spawn_timer.wait_time > 0.3:
-			spawn_timer.wait_time = 0.3
+		if time_remaining < 2.0 and spawn_timer.wait_time > 0.25:
+			spawn_timer.wait_time = 0.25
+		elif time_remaining < 3.5 and spawn_timer.wait_time > 0.6:
+			spawn_timer.wait_time = 0.6
 
 func spawn_ore(spawn_pos: Vector2):
 	var new_ore = ore.instantiate()
@@ -288,11 +287,11 @@ func show_results_screen(total_xp: int):
 	var results = results_scene.instantiate()
 	add_child(results)
 	
-	# Pass session data
+	# Pass session data with custom title
 	var items_dict = {current_ore_name: session_items}
 	print("Items dictionary being passed: " + str(items_dict))
 	
-	results.show_results(total_xp, items_dict)
+	results.show_results(total_xp, items_dict, "⛏️ Mining Complete!")
 	
 	# Wait for player to click continue
 	results.continue_pressed.connect(return_to_map)

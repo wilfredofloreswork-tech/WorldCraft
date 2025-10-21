@@ -1,5 +1,5 @@
 extends Node2D
-# fishing_mini.gd - Stardew Valley style fishing minigame
+# fishing_mini.gd - Stardew Valley style fishing minigame (540x1200)
 
 # Game state
 var fish_caught := 0
@@ -38,11 +38,13 @@ const BAR_BOOST = 4.0
 const BAR_DRAG = 3.0
 const FISH_ACCELERATION = 3.0
 
-# UI dimensions
-const BAR_AREA_HEIGHT = 500.0
-const BAR_AREA_Y = 100.0
-const BAR_WIDTH = 100.0
-const BAR_X = 190.0
+# UI dimensions (540x1200 resolution)
+const BAR_AREA_HEIGHT = 800.0  # Increased for taller screen
+const BAR_AREA_Y = 200.0  # More top padding
+const BAR_WIDTH = 120.0  # Slightly wider for larger screen
+const BAR_X = 210.0  # Centered (270 - 60)
+const FISH_WIDTH = 80.0
+const FISH_HEIGHT = 40.0
 
 # References
 @onready var timer_label = $UI/TimerLabel if has_node("UI/TimerLabel") else null
@@ -56,7 +58,7 @@ const BAR_X = 190.0
 @onready var progress_bar_node = $ProgressBar if has_node("ProgressBar") else null
 
 func _ready():
-	print("\n=== FISHING MINIGAME STARTING ===")
+	print("\n=== FISHING MINIGAME STARTING (540x1200) ===")
 	
 	# Initialize time
 	time_remaining = game_duration
@@ -72,10 +74,10 @@ func _ready():
 	fishing_active = false
 	
 	if instruction_label:
-		instruction_label.text = "Click to cast!"
+		instruction_label.text = "Tap to cast!"
 	
 	update_ui()
-	print("Fishing ready! Click to cast your line!")
+	print("Fishing ready! Tap to cast your line!")
 
 func setup_fish_difficulty():
 	"""Set difficulty based on fish type"""
@@ -218,7 +220,7 @@ func reset_fishing_attempt():
 	bar_velocity = 0.0
 	
 	if instruction_label:
-		instruction_label.text = "Click to cast again!"
+		instruction_label.text = "Tap to cast again!"
 	
 	# Hide fishing UI elements
 	if fishing_bar_bg:
@@ -234,14 +236,14 @@ func show_catch_feedback():
 	"""Show visual feedback for catching a fish"""
 	var feedback = Label.new()
 	feedback.text = "CAUGHT!"
-	feedback.add_theme_font_size_override("font_size", 32)
+	feedback.add_theme_font_size_override("font_size", 48)
 	feedback.modulate = Color(1.0, 1.0, 0.0)
-	feedback.position = Vector2(200, 300)
+	feedback.position = Vector2(220, 500)
 	add_child(feedback)
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(feedback, "position:y", 250, 0.8)
+	tween.tween_property(feedback, "position:y", 450, 0.8)
 	tween.tween_property(feedback, "modulate:a", 0.0, 0.8)
 	
 	await tween.finished
@@ -268,13 +270,14 @@ func update_ui():
 		if catch_bar:
 			catch_bar.visible = true
 			var bar_y = BAR_AREA_Y + (1.0 - bar_position - bar_size) * BAR_AREA_HEIGHT
-			catch_bar.position.y = bar_y
-			catch_bar.size.y = bar_size * BAR_AREA_HEIGHT
+			catch_bar.position = Vector2(BAR_X, bar_y)
+			catch_bar.size = Vector2(BAR_WIDTH, bar_size * BAR_AREA_HEIGHT)
 		
 		if fish_sprite:
 			fish_sprite.visible = true
 			var fish_y = BAR_AREA_Y + (1.0 - fish_position) * BAR_AREA_HEIGHT
-			fish_sprite.position.y = fish_y
+			fish_sprite.position = Vector2(BAR_X + (BAR_WIDTH - FISH_WIDTH) / 2, fish_y - FISH_HEIGHT / 2)
+			fish_sprite.size = Vector2(FISH_WIDTH, FISH_HEIGHT)
 		
 		if progress_bar_node:
 			progress_bar_node.visible = true
@@ -345,7 +348,7 @@ func show_results_screen(total_xp: int):
 	add_child(results)
 	
 	var items_dict = {current_fish_type: session_items}
-	results.show_results(total_xp, items_dict)
+	results.show_results(total_xp, items_dict, "🎣 Fishing Complete!")
 	
 	results.continue_pressed.connect(return_to_map)
 

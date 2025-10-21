@@ -1,5 +1,5 @@
 extends CanvasLayer
-# ResultsScreen.gd - Shows mining session results
+# ResultsScreen.gd - Shows minigame session results
 
 signal continue_pressed
 
@@ -11,6 +11,7 @@ signal continue_pressed
 
 var session_xp := 0
 var session_items := {}
+var session_title := "Session Complete!"
 
 func _ready():
 	# Initially hidden
@@ -21,13 +22,22 @@ func _ready():
 	
 	print("ResultsScreen ready")
 
-func show_results(xp: int, items: Dictionary):
+func show_results(xp: int, items: Dictionary, title: String = "Session Complete!"):
+	"""
+	Show results screen with custom title
+	Args:
+		xp: Total XP earned
+		items: Dictionary of item_name: quantity
+		title: Custom title text (e.g., "Mining Complete!", "Fishing Complete!")
+	"""
 	print("\n=== SHOWING RESULTS ===")
+	print("Title: " + title)
 	print("XP to display: " + str(xp))
 	print("Items to display: " + str(items))
 	
 	session_xp = xp
 	session_items = items.duplicate()  # Make a copy
+	session_title = title
 	
 	# Wait one frame to ensure UI is ready
 	await get_tree().process_frame
@@ -40,16 +50,19 @@ func show_results(xp: int, items: Dictionary):
 func display_results():
 	print("Displaying results...")
 	
+	# Show custom title
+	if title_label:
+		title_label.text = session_title
+		print("Set title to: " + title_label.text)
+	else:
+		print("WARNING: title_label is null!")
+	
 	# Show XP gained
 	if xp_label:
 		xp_label.text = "XP Gained: +" + str(session_xp)
 		print("Set XP label to: " + xp_label.text)
 	else:
 		print("WARNING: xp_label is null!")
-	
-	# Show title
-	if title_label:
-		title_label.text = "Mining Complete!"
 	
 	# Show items collected
 	if items_container:
@@ -73,7 +86,7 @@ func display_results():
 				print("Adding item: " + item_name + " x" + str(count))
 				
 				var label = Label.new()
-				label.text = item_name.replace("_", " ").capitalize() + ": x" + str(count)
+				label.text = ItemDatabase.get_item_display_name(item_name) + ": x" + str(count)
 				label.add_theme_font_size_override("font_size", 20)
 				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				items_container.add_child(label)
@@ -93,7 +106,3 @@ func _on_continue_pressed():
 	print("Continue button pressed")
 	continue_pressed.emit()
 	queue_free()
-
-# Debug function to manually test the results screen
-func debug_test():
-	show_results(500, {"copper_ore": 25, "iron_ore": 10})
