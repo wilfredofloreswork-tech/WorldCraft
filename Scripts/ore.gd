@@ -19,7 +19,7 @@ var ore_data = {
 		"color": Color(0.72, 0.45, 0.20),
 		"health": 80.0,
 		"size": 1.0,
-		"impact_resistance": 1.0  # How much damage it takes from hits
+		"impact_resistance": 1.0
 	},
 	OreType.TIN: {
 		"name": "tin_ore", 
@@ -33,28 +33,28 @@ var ore_data = {
 		"color": Color(0.5, 0.5, 0.55),
 		"health": 150.0,
 		"size": 1.2,
-		"impact_resistance": 0.8  # Takes less damage (harder ore)
+		"impact_resistance": 0.8
 	},
 	OreType.COAL: {
 		"name": "coal",
 		"color": Color(0.15, 0.15, 0.15),
 		"health": 120.0,
 		"size": 1.1,
-		"impact_resistance": 1.2  # Takes more damage (softer)
+		"impact_resistance": 1.2
 	},
 	OreType.GOLD: {
 		"name": "gold_ore",
 		"color": Color(1.0, 0.84, 0.0),
 		"health": 200.0,
 		"size": 0.9,
-		"impact_resistance": 0.7  # Very hard to break
+		"impact_resistance": 0.7
 	},
 	OreType.MITHRIL: {
 		"name": "mithril_ore",
-		"color": Color(0.5, 0.8, 1.0),  # Bright blue
+		"color": Color(0.5, 0.8, 1.0),
 		"health": 300.0,
 		"size": 0.8,
-		"impact_resistance": 0.5  # Extremely hard
+		"impact_resistance": 0.5
 	}
 }
 
@@ -64,15 +64,15 @@ var health_bar: ProgressBar
 func _ready():
 	# Set up collision detection
 	body_entered.connect(_on_body_entered)
-	set_ore_type(2)
-	# Apply ore properties
-	apply_ore_properties()
 	
-	# Create health bar
+	# DON'T apply ore properties here yet - wait for set_ore_type to be called
+	# Just create the health bar
 	create_health_bar()
 
 func set_ore_type(type: OreType):
+	"""Set the ore type and apply its properties"""
 	ore_type = type
+	print("Setting ore type to: " + str(type) + " (" + ore_data[type]["name"] + ")")
 	apply_ore_properties()
 
 func apply_ore_properties():
@@ -82,15 +82,33 @@ func apply_ore_properties():
 	max_health = data["health"]
 	current_health = max_health
 	
-	# Color the sprite if it exists
+	print("Applying properties for " + data["name"] + " with color: " + str(data["color"]))
+	
+	# Color the sprite - check multiple possible node paths
 	var sprite = null
+	
+	# Try different paths where sprite might be
 	if has_node("CollisionShape2D/Sprite2D"):
 		sprite = get_node("CollisionShape2D/Sprite2D")
-
+		print("Found sprite at CollisionShape2D/Sprite2D")
+	elif has_node("Sprite2D"):
+		sprite = get_node("Sprite2D")
+		print("Found sprite at Sprite2D")
+	elif has_node("ColorRect"):
+		sprite = get_node("ColorRect")
+		print("Found ColorRect instead of sprite")
 	
 	if sprite:
 		sprite.modulate = data["color"]
-
+		print("Applied color: " + str(data["color"]) + " to " + sprite.name)
+	else:
+		print("WARNING: No sprite found to color! Checking children...")
+		# Debug: print all children
+		for child in get_children():
+			print("  Child: " + child.name + " (type: " + child.get_class() + ")")
+			if child is CollisionShape2D:
+				for subchild in child.get_children():
+					print("    Subchild: " + subchild.name + " (type: " + subchild.get_class() + ")")
 	
 	# Update health bar if it exists
 	if health_bar:
@@ -101,24 +119,25 @@ func create_health_bar():
 	# Create a simple health bar above the ore
 	health_bar = ProgressBar.new()
 	health_bar.custom_minimum_size = Vector2(50, 2)
-	health_bar.position = Vector2(-25, -40)  # Above the ore
+	health_bar.position = Vector2(-25, -40)
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_bar.show_percentage = false
 	
 	# Style the health bar
 	var style_fg = StyleBoxFlat.new()
-	style_fg.bg_color = Color(0.2, 0.8, 0.2)  # Green
+	style_fg.bg_color = Color(0.2, 0.8, 0.2)
 	health_bar.add_theme_stylebox_override("fill", style_fg)
 	
 	var style_bg = StyleBoxFlat.new()
-	style_bg.bg_color = Color(0.3, 0.3, 0.3)  # Dark gray
+	style_bg.bg_color = Color(0.3, 0.3, 0.3)
 	health_bar.add_theme_stylebox_override("background", style_bg)
 	
 	add_child(health_bar)
 
 func _on_body_entered(body):
 	# Only take damage from the pickaxe
+	print("Body entered ore: " + body.name)
 	if body.name == "RigidBody2D":
 		# Calculate damage based on pickaxe velocity
 		var impact_force = body.linear_velocity.length()
@@ -136,7 +155,7 @@ func take_damage(impact_force: float):
 	# Minimum damage threshold (weak hits don't count)
 	if damage < 5.0:
 		print("Damage too weak! Need at least 5.0 damage")
-		return  # Too weak
+		return
 	
 	# Apply damage
 	current_health -= damage
@@ -155,12 +174,13 @@ func take_damage(impact_force: float):
 	
 	# Check if destroyed
 	if current_health <= 0:
+		print("ORE HEALTH DEPLETED - DESTROYING")
 		destroy_ore()
 
 func flash_damage():
 	# Flash red when damaged
 	var original_modulate = modulate
-	modulate = Color(1.5, 0.8, 0.8)  # Bright red-ish
+	modulate = Color(1.5, 0.8, 0.8)
 	
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", original_modulate, 0.15)
@@ -174,11 +194,11 @@ func update_health_bar():
 		var style = StyleBoxFlat.new()
 		
 		if health_percent > 0.6:
-			style.bg_color = Color(0.2, 0.8, 0.2)  # Green
+			style.bg_color = Color(0.2, 0.8, 0.2)
 		elif health_percent > 0.3:
-			style.bg_color = Color(0.9, 0.7, 0.1)  # Yellow
+			style.bg_color = Color(0.9, 0.7, 0.1)
 		else:
-			style.bg_color = Color(0.9, 0.2, 0.2)  # Red
+			style.bg_color = Color(0.9, 0.2, 0.2)
 		
 		health_bar.add_theme_stylebox_override("fill", style)
 
@@ -195,6 +215,7 @@ func shake_ore(intensity: float):
 func destroy_ore():
 	# Emit destroyed signal FIRST before doing anything else
 	var data = ore_data[ore_type]
+	print("ORE DESTROYED: " + data["name"])
 	destroyed.emit(data["name"])
 	
 	# Create destruction effect

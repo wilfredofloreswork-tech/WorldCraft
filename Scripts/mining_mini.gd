@@ -1,19 +1,19 @@
 extends Node2D
-# MiningMini.gd - Time-based mining with combo system
+# MiningMini.gd - Time-based mining with combo system (FIXED COORDINATES)
 
 # Game state
 var ores_destroyed := 0
-var session_items := 0  # Total ores gained (including combo multiplier)
+var session_items := 0
 var game_active := true
 
 # Combo system
 var combo_count := 0
 var combo_timer := 0.0
-const COMBO_TIMEOUT = 2.0  # Seconds between hits to maintain combo
+const COMBO_TIMEOUT = 2.0
 var combo_multiplier := 1.0
 
-# Ore type for this session (set from world map)
-var current_ore_type = 0  # OreType enum value
+# Ore type for this session
+var current_ore_type = 0
 var current_ore_name = "copper_ore"
 
 # Time settings
@@ -31,17 +31,24 @@ var time_remaining := 0.0
 @onready var ore_count_label = $OreCountLabel if has_node("OreCountLabel") else null
 
 func _ready():
-	# DEBUG: Check if ore type was set
 	print("\n=== MINIGAME STARTING ===")
-
-	
-	# TESTING: Set ore type here if running minigame directly
-	# Comment this out when launching from world map
-	set_ore_type(2, "iron_ore")  # Test with iron
-	
-	print("After set_ore_type:")
 	print("Current ore type: " + str(current_ore_type))
 	print("Current ore name: " + current_ore_name)
+	
+	# Debug spawn locations
+	if spawn_locations:
+		print("Spawn locations found!")
+		print("  Position: " + str(spawn_locations.position))
+		print("  Global position: " + str(spawn_locations.global_position))
+		print("  Point count: " + str(spawn_locations.get_point_count()))
+		if spawn_locations.get_point_count() > 0:
+			print("  First point (local): " + str(spawn_locations.get_point_position(0)))
+			print("  First point (global): " + str(spawn_locations.to_global(spawn_locations.get_point_position(0))))
+	else:
+		print("WARNING: spawn_locations not found!")
+	
+	# TESTING: Set ore type here if running minigame directly
+	set_ore_type(2, "iron_ore")
 	
 	# Initialize time
 	time_remaining = game_duration
@@ -53,12 +60,13 @@ func _ready():
 	
 	# Connect timer
 	spawn_timer.timeout.connect(_on_timer_timeout)
-
 	
 	# Spawn initial ores (all same type)
 	var initial_ores = 3
 	for i in range(initial_ores):
-		spawn_ore(spawn_locations.get_point_position(randi_range(0, spawn_locations.get_point_count()-1)))
+		var spawn_pos = get_random_spawn_position()
+		print("Spawning ore at: " + str(spawn_pos))
+		spawn_ore(spawn_pos)
 	
 	# Start spawning
 	spawn_timer.start()
@@ -67,6 +75,22 @@ func _ready():
 	apply_equipment_bonus()
 	
 	update_ui()
+	print("Mining " + current_ore_name + "! Combo multiplier active!")
+
+func get_random_spawn_position() -> Vector2:
+	"""Get a random spawn position from the Line2D, converted to global coordinates"""
+	if not spawn_locations or spawn_locations.get_point_count() == 0:
+		print("ERROR: No spawn locations available, using fallback")
+		return Vector2(240, 200)  # Fallback position
+	
+	# Get random point from Line2D
+	var random_index = randi_range(0, spawn_locations.get_point_count() - 1)
+	var local_pos = spawn_locations.get_point_position(random_index)
+	
+	# Convert to global coordinates (this is the key fix!)
+	var global_pos = spawn_locations.to_global(local_pos)
+	
+	return global_pos
 
 func set_ore_type(ore_type: int, ore_name: String):
 	"""Call this before starting the minigame to set what ore type to mine"""
@@ -80,16 +104,8 @@ func apply_equipment_bonus():
 		game_duration += bonus_time
 		time_remaining += bonus_time
 		print("Equipped: %s (+%.1fs)" % [equipped_pickaxe, bonus_time])
-func _on_crafting_button_pressed():
-	if Input.is_action_just_pressed("craft_button"):
-		var crafting_scene = load("res://UI/crafting_ui.tscn")
-		var crafting_ui = crafting_scene.instantiate()
-		add_child(crafting_ui)
-		crafting_ui.show_crafting()
-
 
 func _process(delta):
-#	_on_crafting_button_pressed()
 	if not game_active:
 		return
 	
@@ -164,7 +180,7 @@ func update_ui():
 func _on_timer_timeout() -> void:
 	if game_active:
 		# Keep spawning ores of the same type
-		spawn_ore(spawn_locations.get_point_position(randi_range(0, spawn_locations.get_point_count()-1)))
+		spawn_ore(get_random_spawn_position())
 		
 		# Spawn faster as time runs out
 		if time_remaining < 2.0 and spawn_timer.wait_time > 0.15:
@@ -175,7 +191,7 @@ func _on_timer_timeout() -> void:
 func spawn_ore(spawn_pos: Vector2):
 	var new_ore = ore.instantiate()
 	add_child(new_ore)
-	new_ore.position = spawn_pos
+	new_ore.global_position = spawn_pos  # Use global_position instead of position
 	
 	# Set the ore type (all ores are the same type in this session)
 	new_ore.set_ore_type(current_ore_type)
@@ -206,6 +222,7 @@ func _on_ore_destroyed(ore_type: String):
 	# Show combo feedback
 	show_combo_popup(ores_gained)
 	
+	print("Destroyed ore! Combo: x" + str(combo_count) + " (%.1fx multiplier) - Gained %d ores" % [combo_multiplier, ores_gained])
 	
 	update_ui()
 
@@ -243,7 +260,7 @@ func end_minigame():
 			node.queue_free()
 	
 	# Calculate XP (more ores = more XP, combo increases XP)
-	var base_xp_per_ore = get_base_xp_for_ore(current_ore_name)
+	var base_xp_per_ore = ItemDatabase.get_base_xp(current_ore_name)
 	var total_xp = session_items * base_xp_per_ore
 	
 	# Award items and XP to PlayerData
@@ -259,9 +276,6 @@ func end_minigame():
 	
 	# Show results
 	show_results_screen(total_xp)
-
-func get_base_xp_for_ore(ore_name: String) -> int:
-	return ItemDatabase.get_base_xp(ore_name)
 
 func show_results_screen(total_xp: int):
 	print("\n=== PREPARING RESULTS SCREEN ===")
@@ -298,10 +312,10 @@ func pause_or_quit():
 	
 	# Still award items/XP if quitting early
 	if session_items > 0:
-		var base_xp_per_ore = get_base_xp_for_ore(current_ore_name)
+		var base_xp_per_ore = ItemDatabase.get_base_xp(current_ore_name)
 		var total_xp = session_items * base_xp_per_ore
 		PlayerData.add_item(current_ore_name, session_items)
 		PlayerData.add_xp("mining", total_xp)
 	
 	print("Minigame quit early")
-	show_results_screen(session_items * get_base_xp_for_ore(current_ore_name))
+	show_results_screen(session_items * ItemDatabase.get_base_xp(current_ore_name))

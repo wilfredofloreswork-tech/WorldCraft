@@ -1,8 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://dqtulre612u6"]
+[gd_scene load_steps=12 format=3 uid="uid://dqtulre612u6"]
 
 [ext_resource type="Script" uid="uid://c612yxomaykke" path="res://Scripts/MainHub.gd" id="1_7v7ny"]
 [ext_resource type="Texture2D" uid="uid://bra1xaslimjb1" path="res://sprites/rossypoo.png" id="2_7v7ny"]
-[ext_resource type="Texture2D" uid="uid://dsa0ep67ve2pl" path="res://sprites/ChatGPT Image Oct 13, 2025, 01_32_41 AM.png" id="2_edbvw"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
@@ -20,9 +19,6 @@ tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.3
 glow_bloom = 0.2
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gr3u7"]
-albedo_texture = ExtResource("2_edbvw")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(20, 20)
@@ -50,7 +46,6 @@ transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75
 shadow_enabled = true
 
 [node name="Ground" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_gr3u7")
 mesh = SubResource("PlaneMesh_ground")
 surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 

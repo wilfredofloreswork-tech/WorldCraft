@@ -9,18 +9,18 @@
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_c0vda"]
 normal = Vector2(-1, 0)
-distance = -294.0
+distance = -434.0
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bl7gp"]
 normal = Vector2(1, 0)
-distance = -286.0
+distance = -389.0
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_m7yjg"]
 normal = Vector2(0, 1)
-distance = -441.0
+distance = -491.0
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_17env"]
-distance = -362.0
+distance = -922.0
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_c0vda"]
 friction = 0.2
@@ -39,38 +39,46 @@ radius = 210.343
 [node name="MiningMini" type="Node2D"]
 script = ExtResource("1_sp13l")
 
-[node name="TextureRect" type="TextureRect" parent="."]
-offset_right = 480.0
-offset_bottom = 720.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-texture = ExtResource("2_cneo1")
-
-[node name="Label" type="Label" parent="TextureRect"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -82.0
-offset_top = -11.5
-offset_right = 82.0
-offset_bottom = 11.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-text = "Click To Grab Pickaxe!"
-
 [node name="ore" parent="." instance=ExtResource("2_k10td")]
 position = Vector2(-294.888, 213.835)
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(239, 360)
+position = Vector2(270, 600)
 metadata/_edit_lock_ = true
 
+[node name="TextureRect" type="TextureRect" parent="Camera2D"]
+offset_left = -270.0
+offset_top = -600.0
+offset_right = 270.0
+offset_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("2_cneo1")
+flip_h = true
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="Camera2D/TextureRect"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -84.5
+offset_top = -11.5
+offset_right = 84.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Click To Grab Pickaxe!"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
 [node name="WorldBarriers" type="StaticBody2D" parent="."]
-visible = false
+position = Vector2(1, -2)
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WorldBarriers"]
@@ -94,7 +102,8 @@ shape = SubResource("WorldBoundaryShape2D_17env")
 metadata/_edit_lock_ = true
 
 [node name="RigidBody2D" type="RigidBody2D" parent="." groups=["pickable"]]
-position = Vector2(249, 534)
+position = Vector2(257, 852)
+scale = Vector2(1.5, 1.5)
 collision_layer = 3
 mass = 0.1
 physics_material_override = SubResource("PhysicsMaterial_c0vda")
@@ -135,12 +144,12 @@ node_b = NodePath("..")
 metadata/_edit_group_ = true
 
 [node name="Area2D" type="StaticBody2D" parent="."]
+position = Vector2(-518, 50)
 collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_bl7gp")
-metadata/_edit_lock_ = true
 
 [node name="VeinColl" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(238, -81)
+position = Vector2(790, -46)
 shape = SubResource("CircleShape2D_bl7gp")
 debug_color = Color(0, 0.6, 0.701961, 0)
 metadata/_edit_lock_ = true
@@ -148,20 +157,22 @@ metadata/_edit_lock_ = true
 [node name="Sprite2D" type="Sprite2D" parent="Area2D/VeinColl"]
 modulate = Color(0.517184, 0.517184, 0.517184, 1)
 show_behind_parent = true
-position = Vector2(0, -2.36608)
+position = Vector2(-1, 1)
 scale = Vector2(0.847, 0.830536)
 texture = ExtResource("5_c41ia")
+metadata/_edit_lock_ = true
 
 [node name="OrespawnTimer" type="Timer" parent="."]
 wait_time = 1.5
 autostart = true
 
-[node name="OrespawnLocations" type="Line2D" parent="."]
-points = PackedVector2Array(79, 55, 86, 63, 92, 67, 99.4143, 74.4143, 107, 82, 114.83, 87.2199, 121.123, 91.4156, 134, 100, 146.47, 106.506, 157, 112, 191, 124, 230.042, 127.003, 272, 125, 317.98, 114.099, 331, 111, 336, 107, 346, 103, 351.337, 97.7049, 362, 91, 369, 87, 374.285, 82.4355, 380.99, 76.6447, 384.987, 73.1933, 391, 68)
-width = 0.0
-
 [node name="mouseAnchor" type="StaticBody2D" parent="."]
-position = Vector2(251, 530)
+position = Vector2(257, 844)
+
+[node name="OrespawnLocations" type="Line2D" parent="."]
+position = Vector2(100, 126)
+points = PackedVector2Array(-1, 1, 5, 12, 16, 24, 31, 35, 40, 43, 57, 55, 69, 62, 82, 66, 96, 75, 109, 79, 131, 83, 148, 86, 162, 87, 184, 87, 207, 85, 227, 80, 248, 75, 262, 68, 275, 61, 289, 54, 307, 43, 314, 30, 329, 19, 336, 11, 347, -4)
+width = 2.0
 
 [connection signal="mouse_entered" from="RigidBody2D" to="." method="_on_rigid_body_2d_mouse_entered"]
 [connection signal="mouse_shape_entered" from="RigidBody2D" to="." method="_on_rigid_body_2d_mouse_shape_entered"]

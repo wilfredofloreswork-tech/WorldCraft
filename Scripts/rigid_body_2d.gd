@@ -11,7 +11,7 @@ var max_swing_speed = 12.0
 var grabbing = false
 
 func _ready():
-	$"../TextureRect/Label".visible = true
+	$"../Camera2D/TextureRect/Label".visible = true
 	last_mouse_pos = get_global_mouse_position()
 	
 	# Set up the pin joint
@@ -60,4 +60,4 @@ func _on_area_2d_input_event(viewport: Node, event: InputEvent, shape_idx: int) 
 	if event is InputEventMouseButton:
 		if event.is_action_pressed("leftclick"):
 			grabbing = true
-			$"../TextureRect/Label".visible = false
+			$"../Camera2D/TextureRect/Label".visible = false

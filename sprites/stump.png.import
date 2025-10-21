@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://c1414o4vwrex"
 path.s3tc="res://.godot/imported/stump.png-94f19834b252c459737dcca9bbaa3cda.s3tc.ctex"
+path.etc2="res://.godot/imported/stump.png-94f19834b252c459737dcca9bbaa3cda.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://sprites/stump.png"
-dest_files=["res://.godot/imported/stump.png-94f19834b252c459737dcca9bbaa3cda.s3tc.ctex"]
+dest_files=["res://.godot/imported/stump.png-94f19834b252c459737dcca9bbaa3cda.s3tc.ctex", "res://.godot/imported/stump.png-94f19834b252c459737dcca9bbaa3cda.etc2.ctex"]
 
 [params]
 

@@ -22,8 +22,14 @@ PlayerData="*res://Scripts/PlayerData.gd"
 
 [display]
 
-window/size/viewport_width=480
-window/size/viewport_height=720
+window/size/viewport_width=540
+window/size/viewport_height=1200
+window/size/always_on_top=true
+window/size/window_width_override=270
+window/size/window_height_override=600
+window/stretch/mode="viewport"
+window/stretch/aspect="ignore"
+window/handheld/orientation=1
 
 [importer_defaults]
 
@@ -52,3 +58,7 @@ craft_button={
 [physics]
 
 jolt_physics_3d/collisions/collision_margin_fraction=1.0
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true

@@ -41,7 +41,7 @@ func setup_log(good: bool):
 	
 	# Add visual indicator for testing
 	add_quality_label()
-
+	
 func add_quality_label():
 	"""Add text label showing quality (for testing - remove later)"""
 	var label = Label.new()
