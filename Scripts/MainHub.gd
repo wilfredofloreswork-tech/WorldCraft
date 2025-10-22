@@ -15,11 +15,6 @@ extends Node3D
 @onready var player_name_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/PlayerName
 @onready var total_level_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/TotalLevel
 
-# NEW: GPS/Location UI
-@onready var location_panel = $HubUI/LocationPanel if has_node("HubUI/LocationPanel") else null
-@onready var biome_label = $HubUI/LocationPanel/VBoxContainer/BiomeLabel if has_node("HubUI/LocationPanel/VBoxContainer/BiomeLabel") else null
-@onready var location_icon = $HubUI/LocationPanel/VBoxContainer/LocationIcon if has_node("HubUI/LocationPanel/VBoxContainer/LocationIcon") else null
-
 # 3D Scene References
 @onready var camera = $Camera3D
 @onready var player_avatar = $PlayerAvatar
@@ -50,15 +45,6 @@ func _ready():
 	woodcutting_button.pressed.connect(_on_woodcutting_pressed)
 	fishing_button.pressed.connect(_on_fishing_pressed)
 	
-	# NEW: Connect to GPS signals
-	if has_node("/root/GPSManager"):
-		var gps = get_node("/root/GPSManager")
-		gps.biome_changed.connect(_on_biome_changed)
-		gps.location_updated.connect(_on_location_updated)
-		update_location_ui()
-		print("Hub ready! Current biome: " + gps.get_biome_name())
-	else:
-		print("WARNING: GPSManager not found! Make sure it's added as an autoload.")
 	
 	# Update player info
 	update_player_info()
@@ -129,56 +115,6 @@ func update_player_info():
 	
 	player_name_label.text = "Player"
 	total_level_label.text = "Total Level: " + str(total_level)
-
-# NEW: GPS/Location functions
-func update_location_ui():
-	"""Update the location panel with current biome info"""
-	if not biome_label:
-		return
-	
-	if not has_node("/root/GPSManager"):
-		biome_label.text = "GPS Unavailable"
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	var biome_name = gps.get_biome_name()
-	var biome_desc = gps.get_biome_description()
-	
-	biome_label.text = biome_name + "\n" + biome_desc
-	
-	# Update location icon if it exists
-	if location_icon:
-		location_icon.text = "📍"
-
-func _on_biome_changed(biome_id: String, biome_name: String):
-	"""Called when player enters a new biome"""
-	print("Entered new biome: " + biome_name)
-	update_location_ui()
-	
-	# Show notification
-	show_biome_notification(biome_name)
-
-func _on_location_updated(lat: float, lon: float):
-	"""Called when GPS location updates"""
-	print("Location updated: %.4f, %.4f" % [lat, lon])
-
-func show_biome_notification(biome_name: String):
-	"""Show a temporary notification about biome change"""
-	var notification = Label.new()
-	notification.text = "Entered: " + biome_name
-	notification.add_theme_font_size_override("font_size", 24)
-	notification.modulate = Color(1.0, 1.0, 0.5)
-	notification.position = Vector2(170, 300)
-	notification.z_index = 100
-	$HubUI.add_child(notification)
-	
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(notification, "position:y", 250, 1.5)
-	tween.tween_property(notification, "modulate:a", 0.0, 1.5)
-	
-	await tween.finished
-	notification.queue_free()
 
 # ===== MENU BUTTON HANDLERS =====
 

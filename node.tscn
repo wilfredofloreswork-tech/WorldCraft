@@ -1,6 +1,265 @@
 [gd_scene load_steps=2 format=3 uid="uid://c2y02bdp1mean"]
 
-[ext_resource type="Script" uid="uid://datl2qxmdxsqv" path="res://Scripts/GPSManager.gd" id="1_sy5k4"]
+[sub_resource type="GDScript" id="GDScript_nxiqb"]
+script/source = "extends Node
+# GPSManager.gd - Basic GPS and biome detection system
+# Add this as an autoload: Project -> Project Settings -> Autoload -> GPSManager
+
+signal location_updated(latitude, longitude)
+signal biome_changed(new_biome, biome_name)
+
+# GPS State
+var gps_enabled = false
+var current_latitude = 0.0
+var current_longitude = 0.0
+var last_latitude = 0.0
+var last_longitude = 0.0
+
+# Biome State
+var current_biome = \"temperate\"
+var biome_display_name = \"Temperate Zone\"
+
+# Update settings
+var update_interval = 30.0  # Update GPS every 30 seconds (battery friendly)
+var update_timer = 0.0
+
+# Biome definitions with resource mappings
+var biomes = {
+	\"forest\": {
+		\"name\": \"🌲 Forest\",
+		\"description\": \"Dense woodland area\",
+		\"mining\": \"copper_ore\",
+		\"woodcutting\": \"oak_log\",
+		\"fishing\": \"raw_fish\"
+	},
+	\"mountain\": {
+		\"name\": \"⛰️ Mountains\",
+		\"description\": \"Rocky highland terrain\",
+		\"mining\": \"iron_ore\",
+		\"woodcutting\": \"oak_log\",
+		\"fishing\": \"salmon\"
+	},
+	\"coast\": {
+		\"name\": \"🏖️ Coastal\",
+		\"description\": \"Seaside area\",
+		\"mining\": \"gold_ore\",
+		\"woodcutting\": \"oak_log\",
+		\"fishing\": \"tuna\"
+	},
+	\"urban\": {
+		\"name\": \"🏙️ Urban\",
+		\"description\": \"City area\",
+		\"mining\": \"coal\",
+		\"woodcutting\": \"oak_log\",
+		\"fishing\": \"raw_fish\"
+	},
+	\"temperate\": {
+		\"name\": \"🌾 Temperate\",
+		\"description\": \"Mixed terrain\",
+		\"mining\": \"copper_ore\",
+		\"woodcutting\": \"oak_log\",
+		\"fishing\": \"raw_fish\"
+	}
+}
+
+func _ready():
+	print(\"\\n=== GPS MANAGER INITIALIZING ===\")
+	
+	if OS.get_name() == \"Android\":
+		print(\"Android platform detected - requesting GPS permissions\")
+		request_gps_permissions()
+	else:
+		print(\"Running in editor - using mock GPS data\")
+		# Use mock data for testing in editor
+		enable_mock_gps()
+
+func _process(delta):
+	if not gps_enabled:
+		return
+	
+	update_timer += delta
+	
+	if update_timer >= update_interval:
+		update_timer = 0.0
+		update_location()
+
+func request_gps_permissions():
+	\"\"\"Request GPS permissions on Android\"\"\"
+	var permissions = [
+		\"android.permission.ACCESS_FINE_LOCATION\",
+		\"android.permission.ACCESS_COARSE_LOCATION\"
+	]
+	
+	if OS.has_feature(\"android\"):
+		# Check if we have permissions
+		var has_permissions = OS.request_permissions()
+		
+		if has_permissions:
+			print(\"GPS permissions granted!\")
+			start_gps()
+		else:
+			print(\"GPS permissions denied - using mock data\")
+			enable_mock_gps()
+	else:
+		enable_mock_gps()
+
+func start_gps():
+	\"\"\"Initialize GPS tracking (Android only)\"\"\"
+	# Try to get Android GPS plugin
+	if Engine.has_singleton(\"GodotGPS\"):
+		var gps = Engine.get_singleton(\"GodotGPS\")
+		if gps:
+			print(\"GPS plugin found - starting location updates\")
+			gps_enabled = true
+			# Note: Actual GPS plugin integration depends on which plugin you're using
+			# This is a template - you'll need to adjust based on your GPS plugin
+	else:
+		print(\"GPS plugin not found - using mock data\")
+		enable_mock_gps()
+
+func enable_mock_gps():
+	\"\"\"Enable mock GPS for testing in editor\"\"\"
+	gps_enabled = true
+	
+	# Mock location (New York City coordinates as example)
+	current_latitude = 40.7128
+	current_longitude = -74.0060
+	
+	print(\"Mock GPS enabled at: %.4f, %.4f\" % [current_latitude, current_longitude])
+	
+	# Calculate initial biome
+	update_biome()
+
+func update_location():
+	\"\"\"Update current location (called periodically)\"\"\"
+	# In a real app, this would query the GPS hardware
+	# For now, we'll just recalculate the biome
+	
+	# Check if location changed significantly (more than ~100m)
+	var lat_diff = abs(current_latitude - last_latitude)
+	var lon_diff = abs(current_longitude - last_longitude)
+	
+	if lat_diff > 0.001 or lon_diff > 0.001:  # ~100m threshold
+		print(\"Location changed: %.4f, %.4f\" % [current_latitude, current_longitude])
+		last_latitude = current_latitude
+		last_longitude = current_longitude
+		
+		location_updated.emit(current_latitude, current_longitude)
+		update_biome()
+
+func update_biome():
+	\"\"\"Calculate and update current biome based on location\"\"\"
+	var new_biome = calculate_biome(current_latitude, current_longitude)
+	
+	if new_biome != current_biome:
+		print(\"Biome changed: %s -> %s\" % [current_biome, new_biome])
+		current_biome = new_biome
+		biome_display_name = biomes[new_biome][\"name\"]
+		biome_changed.emit(current_biome, biome_display_name)
+
+func calculate_biome(lat: float, lon: float) -> String:
+	\"\"\"
+	Calculate biome type based on latitude and longitude
+	This is a simple hash-based system - you can make it more sophisticated later
+	\"\"\"
+	
+	# Simple grid-based biome calculation
+	# Divide world into regions based on coordinates
+	var lat_zone = int(floor(lat * 10)) % 5
+	var lon_zone = int(floor(lon * 10)) % 5
+	
+	# Combine zones to create biome hash
+	var biome_hash = (lat_zone + lon_zone) % 5
+	
+	match biome_hash:
+		0:
+			return \"forest\"
+		1:
+			return \"mountain\"
+		2:
+			return \"coast\"
+		3:
+			return \"urban\"
+		_:
+			return \"temperate\"
+
+func get_current_biome() -> String:
+	\"\"\"Get current biome ID\"\"\"
+	return current_biome
+
+func get_biome_name() -> String:
+	\"\"\"Get current biome display name\"\"\"
+	return biome_display_name
+
+func get_biome_description() -> String:
+	\"\"\"Get current biome description\"\"\"
+	if biomes.has(current_biome):
+		return biomes[current_biome][\"description\"]
+	return \"Unknown area\"
+
+func get_biome_resource(skill: String) -> String:
+	\"\"\"
+	Get the resource available in current biome for a specific skill
+	Args:
+		skill: \"mining\", \"woodcutting\", or \"fishing\"
+	Returns:
+		Resource item name (e.g., \"iron_ore\", \"oak_log\")
+	\"\"\"
+	if biomes.has(current_biome) and biomes[current_biome].has(skill):
+		return biomes[current_biome][skill]
+	
+	# Fallback to basic resources
+	match skill:
+		\"mining\":
+			return \"copper_ore\"
+		\"woodcutting\":
+			return \"oak_log\"
+		\"fishing\":
+			return \"raw_fish\"
+		_:
+			return \"copper_ore\"
+
+func get_location() -> Dictionary:
+	\"\"\"Get current GPS coordinates\"\"\"
+	return {
+		\"latitude\": current_latitude,
+		\"longitude\": current_longitude,
+		\"enabled\": gps_enabled
+	}
+
+func set_mock_location(lat: float, lon: float):
+	\"\"\"Manually set location (for testing)\"\"\"
+	current_latitude = lat
+	current_longitude = lon
+	print(\"Mock location set to: %.4f, %.4f\" % [lat, lon])
+	update_location()
+
+# Testing functions for development
+func test_biome_changes():
+	\"\"\"Cycle through different biomes for testing\"\"\"
+	print(\"\\n=== TESTING BIOME CHANGES ===\")
+	
+	var test_locations = [
+		{\"lat\": 40.7128, \"lon\": -74.0060, \"name\": \"New York\"},
+		{\"lat\": 51.5074, \"lon\": -0.1278, \"name\": \"London\"},
+		{\"lat\": 35.6762, \"lon\": 139.6503, \"name\": \"Tokyo\"},
+		{\"lat\": -33.8688, \"lon\": 151.2093, \"name\": \"Sydney\"},
+		{\"lat\": 48.8566, \"lon\": 2.3522, \"name\": \"Paris\"}
+	]
+	
+	for location in test_locations:
+		set_mock_location(location[\"lat\"], location[\"lon\"])
+		print(\"%s: Biome = %s\" % [location[\"name\"], get_biome_name()])
+		await get_tree().create_timer(1.0).timeout
+
+func debug_print_status():
+	\"\"\"Print current GPS status for debugging\"\"\"
+	print(\"\\n=== GPS STATUS ===\")
+	print(\"GPS Enabled: \" + str(gps_enabled))
+	print(\"Location: %.4f, %.4f\" % [current_latitude, current_longitude])
+	print(\"Current Biome: \" + current_biome + \" (\" + biome_display_name + \")\")
+	print(\"==================\\n\")
+"
 
 [node name="Node" type="Node"]
-script = ExtResource("1_sy5k4")
+script = SubResource("GDScript_nxiqb")
