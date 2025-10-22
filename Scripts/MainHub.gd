@@ -14,6 +14,11 @@ extends Node3D
 
 @onready var player_name_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/PlayerName
 @onready var total_level_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/TotalLevel
+@onready var gps_status_label = $HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo/GPSStatusLabel
+@onready var plus_code_label = $HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo/PlusCodeLabel
+@onready var coordinates_label = $HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo/CoordinatesLabel
+@onready var biome_label = $HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo/BiomeLabel
+@onready var resource_label = $HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo/ResourceLabel
 
 # 3D Scene References
 @onready var camera = $Camera3D
@@ -30,10 +35,76 @@ var equipment_ui = null
 var camera_rotation = 0.0
 var camera_rotation_speed = 0.1
 
+const DEFAULT_BIOME = "temperate"
+const BIOME_SEQUENCE = ["forest", "mountain", "coast", "urban", "temperate"]
+const BIOMES = {
+        "forest": {
+                "name": "🌲 Forest",
+                "description": "Dense woodland area",
+                "mining": "copper_ore",
+                "woodcutting": "oak_log",
+                "fishing": "raw_fish"
+        },
+        "mountain": {
+                "name": "⛰️ Mountains",
+                "description": "Rocky highland terrain",
+                "mining": "iron_ore",
+                "woodcutting": "oak_log",
+                "fishing": "salmon"
+        },
+        "coast": {
+                "name": "🏖️ Coastal",
+                "description": "Seaside area",
+                "mining": "gold_ore",
+                "woodcutting": "oak_log",
+                "fishing": "tuna"
+        },
+        "urban": {
+                "name": "🏙️ Urban",
+                "description": "City area",
+                "mining": "coal",
+                "woodcutting": "oak_log",
+                "fishing": "raw_fish"
+        },
+        "temperate": {
+                "name": "🌾 Temperate",
+                "description": "Mixed terrain",
+                "mining": "copper_ore",
+                "woodcutting": "oak_log",
+                "fishing": "raw_fish"
+        }
+}
+
+const FALLBACK_RESOURCES = {
+        "mining": "copper_ore",
+        "woodcutting": "oak_log",
+        "fishing": "raw_fish"
+}
+
+const DEBUG_LOCATIONS = [
+        {"name": "Los Angeles", "latitude": 34.0722, "longitude": -118.2606},
+        {"name": "New York", "latitude": 40.7128, "longitude": -74.0060},
+        {"name": "London", "latitude": 51.5074, "longitude": -0.1278},
+        {"name": "Tokyo", "latitude": 35.6762, "longitude": 139.6503},
+        {"name": "Sydney", "latitude": -33.8688, "longitude": 151.2093},
+        {"name": "Paris", "latitude": 48.8566, "longitude": 2.3522}
+]
+
+var praxis_core: Node = null
+var current_plus_code: String = ""
+var current_biome_id: String = DEFAULT_BIOME
+var current_location := {
+        "latitude": 0.0,
+        "longitude": 0.0,
+        "has_precise": false,
+        "plus_code": ""
+}
+var _debug_location_index := 0
+
 func _ready():
-	print("\n=== MAIN HUB LOADED ===")
-	
-	# Connect UI buttons
+        print("\n=== MAIN HUB LOADED ===")
+
+        # Connect UI buttons
 	equipment_button.pressed.connect(_on_equipment_pressed)
 	inventory_button.pressed.connect(_on_inventory_pressed)
 	crafting_button.pressed.connect(_on_crafting_pressed)
@@ -48,9 +119,15 @@ func _ready():
 	
 	# Update player info
 	update_player_info()
-	
-	# Load UI scenes
-	load_ui_scenes()
+
+        # Load UI scenes
+        load_ui_scenes()
+
+        # Clear any lingering activity context from previous sessions
+        PlayerData.clear_activity_context()
+
+        _setup_gps_integration()
+        _update_gps_labels()
 
 func _process(delta):
 	# Slowly rotate camera around player
@@ -63,8 +140,8 @@ func _process(delta):
 	camera.look_at(player_avatar.position, Vector3.UP)
 
 func load_ui_scenes():
-	# Load inventory UI
-	var inventory_scene = load("res://UI/inventory_ui.tscn")
+        # Load inventory UI
+        var inventory_scene = load("res://UI/inventory_ui.tscn")
 	if inventory_scene:
 		inventory_ui = inventory_scene.instantiate()
 		inventory_ui.visible = false
@@ -104,8 +181,157 @@ func load_ui_scenes():
 		$HubUI.add_child(equipment_ui)
 		equipment_ui.equipment_closed.connect(_on_equipment_closed)
 		print("Equipment UI loaded")
-	else:
-		print("WARNING: Could not load equipment_ui.tscn")
+        else:
+                print("WARNING: Could not load equipment_ui.tscn")
+
+# ===== GPS INTEGRATION =====
+
+func _setup_gps_integration():
+        praxis_core = get_node_or_null("/root/PraxisCore")
+        if praxis_core == null:
+                print("WARNING: PraxisCore autoload not found - GPS features disabled")
+                return
+
+        if praxis_core.plusCode_changed.is_connected(_on_plus_code_changed):
+                praxis_core.plusCode_changed.disconnect(_on_plus_code_changed)
+        praxis_core.plusCode_changed.connect(_on_plus_code_changed)
+
+        if praxis_core.location_changed.is_connected(_on_location_changed):
+                praxis_core.location_changed.disconnect(_on_location_changed)
+        praxis_core.location_changed.connect(_on_location_changed)
+
+        current_plus_code = praxis_core.currentPlusCode
+        current_location = _extract_location_from_praxis()
+        _apply_plus_code_location(current_plus_code, true)
+        _update_biome()
+
+func _extract_location_from_praxis() -> Dictionary:
+        var result = {
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "has_precise": false,
+                "plus_code": praxis_core != null ? praxis_core.currentPlusCode : ""
+        }
+
+        if praxis_core == null:
+                return result
+
+        if typeof(praxis_core.last_location) == TYPE_DICTIONARY:
+                var loc: Dictionary = praxis_core.last_location
+                if loc.has("latitude") and loc.has("longitude"):
+                        var lat = float(loc["latitude"])
+                        var lon = float(loc["longitude"])
+                        var has_accuracy = loc.has("accuracy") or praxis_core.gps_provider != null
+                        if has_accuracy:
+                                result["latitude"] = lat
+                                result["longitude"] = lon
+                                result["has_precise"] = true
+
+        if not result["has_precise"] and result["plus_code"] != "":
+                var coords = PlusCodes.Decode(result["plus_code"])
+                result["latitude"] = coords.y
+                result["longitude"] = coords.x
+
+        return result
+
+func _apply_plus_code_location(plus_code: String, force: bool = false):
+        if plus_code == null or plus_code == "":
+                return
+
+        current_plus_code = plus_code
+        current_location["plus_code"] = plus_code
+
+        if force or not current_location.get("has_precise", false):
+                var coords = PlusCodes.Decode(plus_code)
+                current_location["latitude"] = coords.y
+                current_location["longitude"] = coords.x
+
+func _update_biome():
+        var lat = float(current_location.get("latitude", 0.0))
+        var lon = float(current_location.get("longitude", 0.0))
+        var new_biome = _calculate_biome(lat, lon)
+
+        if not BIOMES.has(new_biome):
+                new_biome = DEFAULT_BIOME
+
+        if new_biome != current_biome_id:
+                print("Biome updated: %s -> %s" % [current_biome_id, new_biome])
+                current_biome_id = new_biome
+
+func _calculate_biome(lat: float, lon: float) -> String:
+        if BIOME_SEQUENCE.is_empty():
+                return DEFAULT_BIOME
+
+        var lat_zone = posmod(int(floor(lat * 10.0)), BIOME_SEQUENCE.size())
+        var lon_zone = posmod(int(floor(lon * 10.0)), BIOME_SEQUENCE.size())
+        var index = (lat_zone + lon_zone) % BIOME_SEQUENCE.size()
+        return BIOME_SEQUENCE[index]
+
+func _get_biome_display_name() -> String:
+        return BIOMES.get(current_biome_id, BIOMES[DEFAULT_BIOME]).get("name", "Unknown")
+
+func _get_resource_for_skill(skill: String) -> String:
+        if BIOMES.has(current_biome_id) and BIOMES[current_biome_id].has(skill):
+                return BIOMES[current_biome_id][skill]
+        return FALLBACK_RESOURCES.get(skill, "copper_ore")
+
+func _update_gps_labels():
+        if gps_status_label == null:
+                return
+
+        if praxis_core == null:
+                gps_status_label.text = "GPS: Unavailable"
+        else:
+                var status_text = "GPS: "
+                var precise = current_location.get("has_precise", false)
+                if praxis_core.gps_provider != null:
+                        status_text += "Active"
+                elif precise:
+                        status_text += "Active"
+                else:
+                        status_text += "Simulated"
+                gps_status_label.text = status_text
+
+        var plus_code_text = current_plus_code if current_plus_code != "" else "--"
+        plus_code_label.text = "Plus Code: %s" % plus_code_text
+
+        var lat = float(current_location.get("latitude", 0.0))
+        var lon = float(current_location.get("longitude", 0.0))
+        coordinates_label.text = "Coordinates: %.5f°, %.5f°" % [lat, lon]
+
+        biome_label.text = "Biome: %s" % _get_biome_display_name()
+
+        var mining_line = _compose_resource_line("⛏", "mining")
+        var wood_line = _compose_resource_line("🪓", "woodcutting")
+        var fish_line = _compose_resource_line("🎣", "fishing")
+        resource_label.text = "Resources:\n%s\n%s\n%s" % [mining_line, wood_line, fish_line]
+
+func _compose_resource_line(icon_text: String, skill: String) -> String:
+        var resource_id = _get_resource_for_skill(skill)
+        var display_name = ItemDatabase.get_item_display_name(resource_id)
+        return "%s %s: %s" % [icon_text, skill.capitalize(), display_name]
+
+func _on_plus_code_changed(current: String, _previous: String):
+        _apply_plus_code_location(current, false)
+        _update_biome()
+        _update_gps_labels()
+
+func _on_location_changed(location: Dictionary):
+        if location == null:
+                return
+
+        if location.has("latitude") and location.has("longitude"):
+                current_location["latitude"] = float(location["latitude"])
+                current_location["longitude"] = float(location["longitude"])
+                current_location["has_precise"] = true
+
+        if location.has("plus_code"):
+                _apply_plus_code_location(str(location["plus_code"]), false)
+        elif praxis_core != null:
+                _apply_plus_code_location(praxis_core.currentPlusCode, false)
+
+        _update_biome()
+        _update_gps_labels()
 
 func update_player_info():
 	# Calculate total level
@@ -152,72 +378,87 @@ func _on_pets_pressed():
 # ===== ACTIVITY BUTTON HANDLERS (GPS INTEGRATED) =====
 
 func _on_mining_pressed():
-	print("Starting mining minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get ore type from current biome
-	var ore_type = gps.get_biome_resource("mining")
-	var ore_display_name = ItemDatabase.get_item_display_name(ore_type)
-	
-	print("Mining " + ore_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_ore_type", get_ore_type_id(ore_type))
-	gps.set("pending_ore_name", ore_type)
-	
-	# Change scene
-	get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
+        print("Starting mining minigame...")
+
+        var ore_type = _get_resource_for_skill("mining")
+        var ore_display_name = ItemDatabase.get_item_display_name(ore_type)
+        print("Mining %s in %s" % [ore_display_name, _get_biome_display_name()])
+
+        var context = {
+                "skill": "mining",
+                "resource_id": ore_type,
+                "resource_name": ore_display_name,
+                "ore_type_id": get_ore_type_id(ore_type),
+                "biome_id": current_biome_id,
+                "biome_name": _get_biome_display_name(),
+                "plus_code": current_plus_code,
+                "location": current_location.duplicate(true)
+        }
+        PlayerData.set_activity_context(context)
+
+        get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
 
 func _on_woodcutting_pressed():
-	print("Starting woodcutting minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get log type from current biome
-	var log_type = gps.get_biome_resource("woodcutting")
-	var log_display_name = ItemDatabase.get_item_display_name(log_type)
-	
-	print("Cutting " + log_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_log_type", log_type)
-	
-	# Change scene
-	get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
+        print("Starting woodcutting minigame...")
+
+        var log_type = _get_resource_for_skill("woodcutting")
+        var log_display_name = ItemDatabase.get_item_display_name(log_type)
+        print("Cutting %s in %s" % [log_display_name, _get_biome_display_name()])
+
+        PlayerData.set_activity_context({
+                "skill": "woodcutting",
+                "resource_id": log_type,
+                "resource_name": log_display_name,
+                "biome_id": current_biome_id,
+                "biome_name": _get_biome_display_name(),
+                "plus_code": current_plus_code,
+                "location": current_location.duplicate(true)
+        })
+
+        get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
 
 func _on_fishing_pressed():
-	print("Starting fishing minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get fish type from current biome
-	var fish_type = gps.get_biome_resource("fishing")
-	var fish_display_name = ItemDatabase.get_item_display_name(fish_type)
-	
-	print("Fishing for " + fish_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_fish_type", fish_type)
-	gps.set("pending_fish_name", fish_display_name)
-	
-	# Change scene
-	get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
+        print("Starting fishing minigame...")
+
+        var fish_type = _get_resource_for_skill("fishing")
+        var fish_display_name = ItemDatabase.get_item_display_name(fish_type)
+        print("Fishing for %s in %s" % [fish_display_name, _get_biome_display_name()])
+
+        PlayerData.set_activity_context({
+                "skill": "fishing",
+                "resource_id": fish_type,
+                "resource_name": fish_display_name,
+                "biome_id": current_biome_id,
+                "biome_name": _get_biome_display_name(),
+                "plus_code": current_plus_code,
+                "location": current_location.duplicate(true)
+        })
+
+        get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
+
+func _debug_cycle_locations():
+        if praxis_core == null:
+                print("PraxisCore not available - cannot cycle debug locations")
+                return
+
+        if DEBUG_LOCATIONS.is_empty():
+                return
+
+        var location_info = DEBUG_LOCATIONS[_debug_location_index % DEBUG_LOCATIONS.size()]
+        _debug_location_index += 1
+
+        var plus_code = PlusCodes.EncodeLatLon(location_info["latitude"], location_info["longitude"])
+        print("Debug teleport to %s (%s)" % [location_info["name"], plus_code])
+
+        var location_dict = {
+                "latitude": location_info["latitude"],
+                "longitude": location_info["longitude"],
+                "accuracy": 5.0,
+                "plus_code": plus_code
+        }
+
+        praxis_core.on_monitoring_location_result(location_dict)
+        praxis_core.ForceChange(plus_code)
 
 func get_ore_type_id(ore_name: String) -> int:
 	"""Convert ore name to ore type ID for mining minigame"""
@@ -282,9 +523,7 @@ func _input(event):
 		PlayerData.debug_add_test_items()
 		update_player_info()
 	
-	# Debug: Press L to test biome changes
-	if event.is_action_pressed("ui_page_down"):  # Page Down key
-		print("Testing biome changes...")
-		if has_node("/root/GPSManager"):
-			var gps = get_node("/root/GPSManager")
-			gps.test_biome_changes()
+        # Debug: Press L to test biome changes
+        if event.is_action_pressed("ui_page_down"):  # Page Down key
+                print("Testing biome changes...")
+                _debug_cycle_locations()

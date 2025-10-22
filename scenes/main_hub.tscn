@@ -150,6 +150,49 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 5
 
+[node name="GPSInfoPanel" type="Panel" parent="HubUI/BottomBar/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="GPSInfo" type="VBoxContainer" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="GPSStatusLabel" type="Label" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "GPS: --"
+
+[node name="PlusCodeLabel" type="Label" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Plus Code: --"
+
+[node name="CoordinatesLabel" type="Label" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Coordinates: --"
+
+[node name="BiomeLabel" type="Label" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Biome: --"
+
+[node name="ResourceLabel" type="Label" parent="HubUI/BottomBar/VBoxContainer/GPSInfoPanel/MarginContainer/GPSInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+text = "Resources: --"
+
 [node name="ActivityButtons" type="HBoxContainer" parent="HubUI/BottomBar/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -164,11 +207,9 @@ text = "⛏️ Mining"
 [node name="WoodcuttingButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
-text = "🪓 Woodcut
-"
+text = "🪓 Woodcutting"
 
 [node name="FishingButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
-text = "🎣 Fishing
-"
+text = "🎣 Fishing"
