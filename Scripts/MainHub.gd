@@ -101,6 +101,47 @@ var current_location := {
 }
 var _debug_location_index := 0
 
+func _sanitize_plus_code(raw_value) -> String:
+        if raw_value == null:
+                return ""
+
+        var type_id := typeof(raw_value)
+        var text := ""
+
+        match type_id:
+                TYPE_STRING:
+                        text = raw_value
+                TYPE_STRING_NAME:
+                        text = String(raw_value)
+                TYPE_NODE_PATH:
+                        text = String(raw_value)
+                TYPE_BOOL, TYPE_NIL:
+                        return ""
+                _:
+                        return ""
+
+        text = text.strip_edges().to_upper()
+
+        var normalized := text.replace("+", "")
+        if normalized.length() < 2:
+                return ""
+
+        for i in normalized.length():
+                var char := normalized[i]
+                if PlusCodes.CODE_ALPHABET_.find(char) == -1:
+                        return ""
+
+        if text.find("+") == -1 and text.length() >= 8:
+                text = text.substr(0, 8) + "+" + text.substr(8)
+
+        return text
+
+func _get_location_snapshot() -> Dictionary:
+        var snapshot := current_location.duplicate(true)
+        if snapshot.has("plus_code"):
+                snapshot["plus_code"] = _sanitize_plus_code(snapshot["plus_code"])
+        return snapshot
+
 func _ready():
         print("\n=== MAIN HUB LOADED ===")
 
@@ -200,9 +241,9 @@ func _setup_gps_integration():
                 praxis_core.location_changed.disconnect(_on_location_changed)
         praxis_core.location_changed.connect(_on_location_changed)
 
-        current_plus_code = praxis_core.currentPlusCode
+        var starting_plus_code := _sanitize_plus_code(praxis_core.currentPlusCode)
         current_location = _extract_location_from_praxis()
-        _apply_plus_code_location(current_plus_code, true)
+        _apply_plus_code_location(starting_plus_code, true)
         _update_biome()
 
 func _extract_location_from_praxis() -> Dictionary:
@@ -210,7 +251,7 @@ func _extract_location_from_praxis() -> Dictionary:
                 "latitude": 0.0,
                 "longitude": 0.0,
                 "has_precise": false,
-                "plus_code": praxis_core != null ? praxis_core.currentPlusCode : ""
+                "plus_code": praxis_core != null ? _sanitize_plus_code(praxis_core.currentPlusCode) : ""
         }
 
         if praxis_core == null:
@@ -227,15 +268,17 @@ func _extract_location_from_praxis() -> Dictionary:
                                 result["longitude"] = lon
                                 result["has_precise"] = true
 
-        if not result["has_precise"] and result["plus_code"] != "":
-                var coords = PlusCodes.Decode(result["plus_code"])
+        var plus_code := result.get("plus_code", "")
+        if not result["has_precise"] and plus_code != "":
+                var coords = PlusCodes.Decode(plus_code)
                 result["latitude"] = coords.y
                 result["longitude"] = coords.x
 
         return result
 
-func _apply_plus_code_location(plus_code: String, force: bool = false):
-        if plus_code == null or plus_code == "":
+func _apply_plus_code_location(raw_plus_code, force: bool = false):
+        var plus_code := _sanitize_plus_code(raw_plus_code)
+        if plus_code == "":
                 return
 
         current_plus_code = plus_code
@@ -292,7 +335,9 @@ func _update_gps_labels():
                         status_text += "Simulated"
                 gps_status_label.text = status_text
 
-        var plus_code_text = current_plus_code if current_plus_code != "" else "--"
+        var plus_code_text = _sanitize_plus_code(current_plus_code)
+        if plus_code_text == "":
+                plus_code_text = "--"
         plus_code_label.text = "Plus Code: %s" % plus_code_text
 
         var lat = float(current_location.get("latitude", 0.0))
@@ -326,7 +371,7 @@ func _on_location_changed(location: Dictionary):
                 current_location["has_precise"] = true
 
         if location.has("plus_code"):
-                _apply_plus_code_location(str(location["plus_code"]), false)
+                _apply_plus_code_location(location["plus_code"], false)
         elif praxis_core != null:
                 _apply_plus_code_location(praxis_core.currentPlusCode, false)
 
@@ -384,6 +429,9 @@ func _on_mining_pressed():
         var ore_display_name = ItemDatabase.get_item_display_name(ore_type)
         print("Mining %s in %s" % [ore_display_name, _get_biome_display_name()])
 
+        var safe_plus_code := _sanitize_plus_code(current_plus_code)
+        var location_snapshot := _get_location_snapshot()
+
         var context = {
                 "skill": "mining",
                 "resource_id": ore_type,
@@ -391,8 +439,8 @@ func _on_mining_pressed():
                 "ore_type_id": get_ore_type_id(ore_type),
                 "biome_id": current_biome_id,
                 "biome_name": _get_biome_display_name(),
-                "plus_code": current_plus_code,
-                "location": current_location.duplicate(true)
+                "plus_code": safe_plus_code,
+                "location": location_snapshot
         }
         PlayerData.set_activity_context(context)
 
@@ -405,14 +453,17 @@ func _on_woodcutting_pressed():
         var log_display_name = ItemDatabase.get_item_display_name(log_type)
         print("Cutting %s in %s" % [log_display_name, _get_biome_display_name()])
 
+        var safe_plus_code := _sanitize_plus_code(current_plus_code)
+        var location_snapshot := _get_location_snapshot()
+
         PlayerData.set_activity_context({
                 "skill": "woodcutting",
                 "resource_id": log_type,
                 "resource_name": log_display_name,
                 "biome_id": current_biome_id,
                 "biome_name": _get_biome_display_name(),
-                "plus_code": current_plus_code,
-                "location": current_location.duplicate(true)
+                "plus_code": safe_plus_code,
+                "location": location_snapshot
         })
 
         get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
@@ -424,14 +475,17 @@ func _on_fishing_pressed():
         var fish_display_name = ItemDatabase.get_item_display_name(fish_type)
         print("Fishing for %s in %s" % [fish_display_name, _get_biome_display_name()])
 
+        var safe_plus_code := _sanitize_plus_code(current_plus_code)
+        var location_snapshot := _get_location_snapshot()
+
         PlayerData.set_activity_context({
                 "skill": "fishing",
                 "resource_id": fish_type,
                 "resource_name": fish_display_name,
                 "biome_id": current_biome_id,
                 "biome_name": _get_biome_display_name(),
-                "plus_code": current_plus_code,
-                "location": current_location.duplicate(true)
+                "plus_code": safe_plus_code,
+                "location": location_snapshot
         })
 
         get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
