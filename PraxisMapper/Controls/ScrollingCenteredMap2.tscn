@@ -1,0 +1,105 @@
+[gd_scene load_steps=6 format=3 uid="uid://bpnt0yvbysdow"]
+
+[ext_resource type="Script" uid="uid://d1f647e0d5w1f" path="res://PraxisMapper/Controls/ScrollingCenteredMap2.gd" id="1_om4r7"]
+[ext_resource type="Texture2D" uid="uid://c3033wigb05gp" path="res://PraxisMapper/Resources/kenney_arrow.png" id="3_mhlsw"]
+[ext_resource type="PackedScene" uid="uid://fipn8k07sdhc" path="res://PraxisMapper/FullOffline/FullSingleTileQueued.tscn" id="3_x4y4u"]
+[ext_resource type="PackedScene" uid="uid://b2hnhr1t57jm7" path="res://PraxisMapper/Controls/CellTracker.tscn" id="5_i08gh"]
+[ext_resource type="PackedScene" uid="uid://bev1jin6r7t6n" path="res://PraxisMapper/Controls/GetFile.tscn" id="5_spgqn"]
+
+[node name="ScrollingCenteredMap" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -200.0
+offset_right = 160.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_om4r7")
+
+[node name="centerIndicator" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.441199, 0, 0.227991, 1)
+
+[node name="ColorRect" type="ColorRect" parent="centerIndicator"]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -9.0
+offset_right = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.55071, 0.347919, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="centerIndicator"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -11.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.55071, 0.347919, 1)
+
+[node name="Label" type="Label" parent="centerIndicator"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -24.5
+offset_right = 160.0
+offset_bottom = 24.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "ScrollingCenteredMap
+Center"
+horizontal_alignment = 1
+
+[node name="mapBase" type="Node2D" parent="."]
+
+[node name="cellTrackerDrawers" type="Node2D" parent="."]
+
+[node name="trackedChildren" type="Node2D" parent="."]
+
+[node name="TileDrawerQueued" parent="." instance=ExtResource("3_x4y4u")]
+
+[node name="playerIndicator" type="TextureRect" parent="."]
+z_index = 1
+layout_mode = 0
+offset_top = 3.0
+offset_right = 16.0
+offset_bottom = 28.0
+pivot_offset = Vector2(8, 12.5)
+texture = ExtResource("3_mhlsw")
+
+[node name="Center" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.92017, 7.41214e-06, 0.581041, 1)
+
+[node name="CellTracker" parent="." instance=ExtResource("5_i08gh")]
+
+[node name="GetFile" parent="." instance=ExtResource("5_spgqn")]

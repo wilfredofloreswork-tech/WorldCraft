@@ -17,8 +17,10 @@ config/icon="uid://dsa0ep67ve2pl"
 
 [autoload]
 
+GPSManager="*res://Scripts/GPSManager.gd"
 ItemDatabase="*res://Scripts/ItemDatabase.gd"
 PlayerData="*res://Scripts/PlayerData.gd"
+PraxisCore="*res://PraxisMapper/Scripts/PraxisCore.gd"
 
 [display]
 
@@ -30,6 +32,10 @@ window/size/window_height_override=600
 window/stretch/mode="viewport"
 window/stretch/aspect="ignore"
 window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/PraxisMapperGPSPlugin/plugin.cfg")
 
 [importer_defaults]
 

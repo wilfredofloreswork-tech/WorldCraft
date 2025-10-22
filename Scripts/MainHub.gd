@@ -1,5 +1,5 @@
 extends Node3D
-# MainHub.gd - Main 3D hub scene controller
+# MainHub.gd - Main 3D hub scene controller with GPS integration
 
 # UI References
 @onready var inventory_button = $HubUI/TopBar/HBoxContainer/MenuButtons/InventoryButton
@@ -14,6 +14,11 @@ extends Node3D
 
 @onready var player_name_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/PlayerName
 @onready var total_level_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/TotalLevel
+
+# NEW: GPS/Location UI
+@onready var location_panel = $HubUI/LocationPanel if has_node("HubUI/LocationPanel") else null
+@onready var biome_label = $HubUI/LocationPanel/VBoxContainer/BiomeLabel if has_node("HubUI/LocationPanel/VBoxContainer/BiomeLabel") else null
+@onready var location_icon = $HubUI/LocationPanel/VBoxContainer/LocationIcon if has_node("HubUI/LocationPanel/VBoxContainer/LocationIcon") else null
 
 # 3D Scene References
 @onready var camera = $Camera3D
@@ -45,13 +50,21 @@ func _ready():
 	woodcutting_button.pressed.connect(_on_woodcutting_pressed)
 	fishing_button.pressed.connect(_on_fishing_pressed)
 	
+	# NEW: Connect to GPS signals
+	if has_node("/root/GPSManager"):
+		var gps = get_node("/root/GPSManager")
+		gps.biome_changed.connect(_on_biome_changed)
+		gps.location_updated.connect(_on_location_updated)
+		update_location_ui()
+		print("Hub ready! Current biome: " + gps.get_biome_name())
+	else:
+		print("WARNING: GPSManager not found! Make sure it's added as an autoload.")
+	
 	# Update player info
 	update_player_info()
 	
 	# Load UI scenes
 	load_ui_scenes()
-	
-	print("Hub ready! Press buttons to access menus")
 
 func _process(delta):
 	# Slowly rotate camera around player
@@ -96,6 +109,7 @@ func load_ui_scenes():
 		print("Skills UI loaded")
 	else:
 		print("WARNING: Could not load skills_ui.tscn")
+	
 	# Load equipment UI
 	var equipment_scene = load("res://UI/equipment_ui.tscn")
 	if equipment_scene:
@@ -106,11 +120,6 @@ func load_ui_scenes():
 		print("Equipment UI loaded")
 	else:
 		print("WARNING: Could not load equipment_ui.tscn")
-	
-	print("UI scenes loaded")
-	
-	# Pets UI will be added later
-	print("UI scenes loaded")
 
 func update_player_info():
 	# Calculate total level
@@ -118,8 +127,58 @@ func update_player_info():
 	for skill_name in PlayerData.player_data["skills"]:
 		total_level += PlayerData.get_skill_level(skill_name)
 	
-	player_name_label.text = "Player"  # You can add player name to PlayerData later
+	player_name_label.text = "Player"
 	total_level_label.text = "Total Level: " + str(total_level)
+
+# NEW: GPS/Location functions
+func update_location_ui():
+	"""Update the location panel with current biome info"""
+	if not biome_label:
+		return
+	
+	if not has_node("/root/GPSManager"):
+		biome_label.text = "GPS Unavailable"
+		return
+	
+	var gps = get_node("/root/GPSManager")
+	var biome_name = gps.get_biome_name()
+	var biome_desc = gps.get_biome_description()
+	
+	biome_label.text = biome_name + "\n" + biome_desc
+	
+	# Update location icon if it exists
+	if location_icon:
+		location_icon.text = "📍"
+
+func _on_biome_changed(biome_id: String, biome_name: String):
+	"""Called when player enters a new biome"""
+	print("Entered new biome: " + biome_name)
+	update_location_ui()
+	
+	# Show notification
+	show_biome_notification(biome_name)
+
+func _on_location_updated(lat: float, lon: float):
+	"""Called when GPS location updates"""
+	print("Location updated: %.4f, %.4f" % [lat, lon])
+
+func show_biome_notification(biome_name: String):
+	"""Show a temporary notification about biome change"""
+	var notification = Label.new()
+	notification.text = "Entered: " + biome_name
+	notification.add_theme_font_size_override("font_size", 24)
+	notification.modulate = Color(1.0, 1.0, 0.5)
+	notification.position = Vector2(170, 300)
+	notification.z_index = 100
+	$HubUI.add_child(notification)
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(notification, "position:y", 250, 1.5)
+	tween.tween_property(notification, "modulate:a", 0.0, 1.5)
+	
+	await tween.finished
+	notification.queue_free()
 
 # ===== MENU BUTTON HANDLERS =====
 
@@ -153,36 +212,106 @@ func _on_equipment_closed():
 
 func _on_pets_pressed():
 	print("Pets menu coming soon!")
-	# TODO: Open pets UI when created
 
-# ===== ACTIVITY BUTTON HANDLERS =====
+# ===== ACTIVITY BUTTON HANDLERS (GPS INTEGRATED) =====
 
 func _on_mining_pressed():
 	print("Starting mining minigame...")
-	# Load and switch to mining scene
+	
+	if not has_node("/root/GPSManager"):
+		print("ERROR: GPSManager not available!")
+		get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
+		return
+	
+	var gps = get_node("/root/GPSManager")
+	
+	# Get ore type from current biome
+	var ore_type = gps.get_biome_resource("mining")
+	var ore_display_name = ItemDatabase.get_item_display_name(ore_type)
+	
+	print("Mining " + ore_display_name + " in " + gps.get_biome_name())
+	
+	# Store settings for minigame to pick up
+	gps.set("pending_ore_type", get_ore_type_id(ore_type))
+	gps.set("pending_ore_name", ore_type)
+	
+	# Change scene
 	get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
 
 func _on_woodcutting_pressed():
 	print("Starting woodcutting minigame...")
-	# Load and switch to woodcutting scene
+	
+	if not has_node("/root/GPSManager"):
+		print("ERROR: GPSManager not available!")
+		get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
+		return
+	
+	var gps = get_node("/root/GPSManager")
+	
+	# Get log type from current biome
+	var log_type = gps.get_biome_resource("woodcutting")
+	var log_display_name = ItemDatabase.get_item_display_name(log_type)
+	
+	print("Cutting " + log_display_name + " in " + gps.get_biome_name())
+	
+	# Store settings for minigame to pick up
+	gps.set("pending_log_type", log_type)
+	
+	# Change scene
 	get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
 
 func _on_fishing_pressed():
 	print("Starting fishing minigame...")
-	# Load and switch to fishing scene
+	
+	if not has_node("/root/GPSManager"):
+		print("ERROR: GPSManager not available!")
+		get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
+		return
+	
+	var gps = get_node("/root/GPSManager")
+	
+	# Get fish type from current biome
+	var fish_type = gps.get_biome_resource("fishing")
+	var fish_display_name = ItemDatabase.get_item_display_name(fish_type)
+	
+	print("Fishing for " + fish_display_name + " in " + gps.get_biome_name())
+	
+	# Store settings for minigame to pick up
+	gps.set("pending_fish_type", fish_type)
+	gps.set("pending_fish_name", fish_display_name)
+	
+	# Change scene
 	get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
+
+func get_ore_type_id(ore_name: String) -> int:
+	"""Convert ore name to ore type ID for mining minigame"""
+	match ore_name:
+		"copper_ore":
+			return 0
+		"tin_ore":
+			return 1
+		"iron_ore":
+			return 2
+		"coal":
+			return 3
+		"gold_ore":
+			return 4
+		"mithril_ore":
+			return 5
+		_:
+			return 0  # Default to copper
 
 func _on_inventory_closed():
 	print("Inventory closed")
-	update_player_info()  # Refresh stats in case items were equipped
+	update_player_info()
 
 func _on_crafting_closed():
 	print("Crafting closed")
-	update_player_info()  # Refresh stats in case player leveled up
+	update_player_info()
 
 func _on_skills_closed():
 	print("Skills closed")
-	update_player_info()  # Refresh total level display
+	update_player_info()
 
 func close_all_menus():
 	if inventory_ui and inventory_ui.visible:
@@ -197,7 +326,6 @@ func close_all_menus():
 # ===== INPUT HANDLING =====
 
 func _unhandled_input(event):
-	# Quick access shortcuts
 	if event.is_action_pressed("ui_cancel"):
 		# Close any open menus
 		if inventory_ui and inventory_ui.visible:
@@ -208,9 +336,6 @@ func _unhandled_input(event):
 			skills_ui.hide_skills()
 		elif equipment_ui and equipment_ui.visible:
 			equipment_ui.hide_equipment()
-		else:
-			# Could show a "quit game?" dialog here
-			pass
 
 # ===== DEBUG FUNCTIONS =====
 
@@ -220,3 +345,10 @@ func _input(event):
 		print("Adding test items...")
 		PlayerData.debug_add_test_items()
 		update_player_info()
+	
+	# Debug: Press L to test biome changes
+	if event.is_action_pressed("ui_page_down"):  # Page Down key
+		print("Testing biome changes...")
+		if has_node("/root/GPSManager"):
+			var gps = get_node("/root/GPSManager")
+			gps.test_biome_changes()

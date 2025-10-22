@@ -58,6 +58,7 @@ func _on_body_entered(body):
 	
 	if body.name == "AxeHead" or "Axe" in body.name:
 		hit_by_axe(body)
+		
 
 func hit_by_axe(axe_node):
 	"""Process axe hit"""
