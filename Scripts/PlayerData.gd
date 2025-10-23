@@ -16,10 +16,10 @@ signal equipment_changed(slot, item_name)
 # ===== CORE DATA STRUCTURE =====
 # This Dictionary holds ALL player data. Think of it like a big nested container.
 var player_data = {
-        "skills": {
-                # Each skill has: current level, current XP, total XP earned
-                "mining": {"level": 1, "xp": 0, "total_xp": 0},
-                "smithing": {"level": 1, "xp": 0, "total_xp": 0},
+	"skills": {
+		# Each skill has: current level, current XP, total XP earned
+		"mining": {"level": 1, "xp": 0, "total_xp": 0},
+		"smithing": {"level": 1, "xp": 0, "total_xp": 0},
 		"woodcutting": {"level": 1, "xp": 0, "total_xp": 0},
 		"fishing": {"level": 1, "xp": 0, "total_xp": 0},
 		"herbalism": {"level": 1, "xp": 0, "total_xp": 0},
@@ -44,15 +44,13 @@ var player_data = {
 		"items_crafted": 0,
 		"distance_traveled": 0.0
 	},
-        "settings": {
-                # Player preferences
-                "sound_volume": 1.0,
-                "music_volume": 0.7,
-                "notifications_enabled": true
-        }
+	"settings": {
+		# Player preferences
+		"sound_volume": 1.0,
+		"music_volume": 0.7,
+		"notifications_enabled": true
+	}
 }
-
-var activity_context := {}
 
 # ===== XP REQUIREMENTS =====
 # XP needed to reach each level (RuneScape-inspired formula)
@@ -340,24 +338,13 @@ func get_equipped_item(slot: String):
 
 # Check if any item is equipped in a slot
 func is_slot_equipped(slot: String) -> bool:
-        return player_data["equipment"].get(slot) != null
-
-# ===== ACTIVITY CONTEXT =====
-
-func set_activity_context(context: Dictionary):
-        activity_context = context.duplicate(true)
-
-func get_activity_context() -> Dictionary:
-        return activity_context.duplicate(true)
-
-func clear_activity_context():
-        activity_context.clear()
+	return player_data["equipment"].get(slot) != null
 
 # ===== STATISTICS FUNCTIONS =====
 
 func increment_stat(stat_name: String, amount: float = 1.0):
-        if player_data["statistics"].has(stat_name):
-                player_data["statistics"][stat_name] += amount
+	if player_data["statistics"].has(stat_name):
+		player_data["statistics"][stat_name] += amount
 
 func get_stat(stat_name: String) -> float:
 	if player_data["statistics"].has(stat_name):

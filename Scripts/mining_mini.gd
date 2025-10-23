@@ -31,12 +31,9 @@ var time_remaining := 0.0
 @onready var ore_count_label = $OreCountLabel if has_node("OreCountLabel") else null
 
 func _ready():
-        print("\n=== MINIGAME STARTING ===")
-
-        _apply_activity_context()
-
-        print("Current ore type: " + str(current_ore_type))
-        print("Current ore name: " + current_ore_name)
+	print("\n=== MINIGAME STARTING ===")
+	print("Current ore type: " + str(current_ore_type))
+	print("Current ore name: " + current_ore_name)
 	
 	# Debug spawn locations
 	if spawn_locations:
@@ -70,11 +67,11 @@ func _ready():
 		print("Spawning ore at: " + str(spawn_pos))
 		spawn_ore(spawn_pos)
 	
-        # Start spawning
-        spawn_timer.start()
-
-        # Equipment bonus
-        apply_equipment_bonus()
+	# Start spawning
+	spawn_timer.start()
+	
+	# Equipment bonus
+	apply_equipment_bonus()
 	
 	update_ui()
 	print("Mining " + current_ore_name + "! Combo multiplier active!")
@@ -297,21 +294,20 @@ func show_results_screen(total_xp: int):
 	results.show_results(total_xp, items_dict, "⛏️ Mining Complete!")
 	
 	# Wait for player to click continue
-        results.continue_pressed.connect(return_to_map)
+	results.continue_pressed.connect(return_to_map)
 
 func return_to_map():
-        print("Returning to hub...")
-        PlayerData.clear_activity_context()
-        # Return to the main hub
-        get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
+	print("Returning to hub...")
+	# Return to the main hub
+	get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		pause_or_quit()
 
 func pause_or_quit():
-        game_active = false
-        spawn_timer.stop()
+	game_active = false
+	spawn_timer.stop()
 	
 	# Still award items/XP if quitting early
 	if session_items > 0:
@@ -320,42 +316,5 @@ func pause_or_quit():
 		PlayerData.add_item(current_ore_name, session_items)
 		PlayerData.add_xp("mining", total_xp)
 	
-        print("Minigame quit early")
-        show_results_screen(session_items * ItemDatabase.get_base_xp(current_ore_name))
-
-func _apply_activity_context():
-        var context = PlayerData.get_activity_context()
-        if context.is_empty():
-                return
-
-        if context.get("skill", "") != "mining":
-                return
-
-        if context.has("ore_type_id"):
-                current_ore_type = int(context["ore_type_id"])
-        elif context.has("resource_id"):
-                current_ore_type = _map_ore_name_to_id(str(context["resource_id"]))
-
-        if context.has("resource_name"):
-                current_ore_name = str(context["resource_name"])
-        elif context.has("resource_id"):
-                current_ore_name = str(context["resource_id"])
-
-        print("Loaded mining context: %s" % context)
-
-func _map_ore_name_to_id(ore_name: String) -> int:
-        match ore_name:
-                "copper_ore":
-                        return 0
-                "tin_ore":
-                        return 1
-                "iron_ore":
-                        return 2
-                "coal":
-                        return 3
-                "gold_ore":
-                        return 4
-                "mithril_ore":
-                        return 5
-                _:
-                        return current_ore_type
+	print("Minigame quit early")
+	show_results_screen(session_items * ItemDatabase.get_base_xp(current_ore_name))
