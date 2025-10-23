@@ -34,7 +34,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/PraxisMapperGPSPlugin/plugin.cfg")
+enabled=PackedStringArray("res://addons/GodotGPSPlugin-main/addons/PraxisMapperGPSPlugin/plugin.cfg")
 
 [importer_defaults]
 

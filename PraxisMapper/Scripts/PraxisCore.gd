@@ -1,7 +1,4 @@
 extends Node
-#NOTE: this needs to be an autoload/global class, due to signals and helpers that
-#add/remove children to the tree. Those will need to be sorted or handled before
-#this can be reduced to a static class.
 
 #Any universally-helpful functions that aren't specific to an operating mode go here
 #Server calls go to PraxisServer. Offline data loading goes to PraxisOfflineData.
@@ -16,21 +13,22 @@ var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA, USA
 #var debugStartingPlusCode = "7JWVP5923M" #Shalimar Bagh, Delhi, India
 #var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH, USA
 
+var prettyPrintSaveData = false
+var errorLog = "user://errors.log"
 
 #System global values
 #Resolution of PlusCode cells in degrees
 const resolutionCell12Lat = .000025 / 5
-const resolutionCell12Lon = .00003125 / 4
-const resolutionCell11Lat = .000025
-const resolutionCell11Lon = .00003125
-const resolutionCell10 = .000125
-const resolutionCell8 = .0025
-const resolutionCell6 = .05
-const resolutionCell4 = 1
-const resolutionCell2 = 20
-const metersPerDegree = 111132
+const resolutionCell12Lon = .00003125 / 4; 
+const resolutionCell11Lat = .000025;
+const resolutionCell11Lon = .00003125; 
+const resolutionCell10 = .000125; 
+const resolutionCell8 = .0025; 
+const resolutionCell6 = .05; 
+const resolutionCell4 = 1; 
+const resolutionCell2 = 20;
+const metersPerDegree = 111111
 const oneMeterLat = 1 / metersPerDegree
-const earthCircumferenceMeters = 40075000
 
 const safetyTips = [
 	"Pay more attention to your surroundings than your phone.",
@@ -38,8 +36,6 @@ const safetyTips = [
 ]
 
 #system config values. These are for Cell12 resolution images from detailed data.
-#TODO: explain why/when height should be 400 (Server drawing Cell11 tiles, 4:5) 
-#vs 500 (client drawing Cel1l2 tiles, 16:25 is not the same aspect ratio)
 var mapTileWidth = 320 
 var mapTileHeight = 500
 
@@ -64,7 +60,7 @@ var last_location = {
 	longitude = 1,
 	speed = 1
 } # is the entire GPS data dictionary
-signal force_redraw() # called when the map should re-draw tiles
+var current_gps_packet = {}
 
 #Plugin for gps info
 var gps_provider
@@ -77,16 +73,14 @@ func SetProxyPlay(state):
 			playerStart = PlusCodes.Decode(currentPlusCode)
 		lastPlusCode = currentPlusCode
 		currentPlusCode = proxyCode
-		plusCode_changed.emit(currentPlusCode, lastPlusCode)
-	else: 
-		on_monitoring_location_result(last_location) #Teleport to our actual last position
+		PraxisCore.plusCode_changed.emit(currentPlusCode, lastPlusCode)
 
 func ForceChange(newCode):
 	if newCode.find("+") == -1:
 		newCode = newCode.substr(0,8) + "+" + newCode.substr(8)
 	lastPlusCode = currentPlusCode
 	currentPlusCode = newCode
-	plusCode_changed.emit(currentPlusCode, lastPlusCode)
+	PraxisCore.plusCode_changed.emit(currentPlusCode, lastPlusCode)
 	
 func GetFixedRNGForPluscode(pluscode):
 	var rng = RandomNumberGenerator.new()
@@ -94,7 +88,6 @@ func GetFixedRNGForPluscode(pluscode):
 	return rng
 	
 func on_monitoring_location_result(location: Dictionary) -> void:
-	last_location = location.duplicate() #saves the actual location values and don't change those.
 	if proxyPlay == true:
 		var playerRealPoint = Vector2(location["longitude"], location["latitude"])
 		if playerStart == Vector2(0,0):
@@ -104,8 +97,11 @@ func on_monitoring_location_result(location: Dictionary) -> void:
 		var inGamePoint = proxyBase - diff
 		location["longitude"] = inGamePoint.x
 		location["latitude"] = inGamePoint.y
-
+	
+	print("location change detected, firing off.")
+	last_location = location
 	location_changed.emit(location)
+	print("location change signal fired.")
 	var plusCode = ""
 	var accuracy = float(location["accuracy"])
 	if (autoPrecision and accuracy <= 6) or precision == 11:
@@ -113,10 +109,13 @@ func on_monitoring_location_result(location: Dictionary) -> void:
 	else:
 		plusCode = PlusCodes.EncodeLatLonSize(location["latitude"], location["longitude"], 10)
 	
+	print("Detected plus code: " + plusCode)
+	
 	if (plusCode != currentPlusCode):
 		lastPlusCode = currentPlusCode
 		currentPlusCode = plusCode
 		plusCode_changed.emit(currentPlusCode, lastPlusCode)
+		print("new plusCode: " + plusCode)
 		
 func perm_check(permName, wasGranted):
 	if permName == "android.permission.ACCESS_FINE_LOCATION" and wasGranted == true:
@@ -130,11 +129,17 @@ func _ready():
 	DirAccess.make_dir_absolute("user://BoundsTiles")
 	DirAccess.make_dir_absolute("user://TerrainTiles")
 	DirAccess.make_dir_absolute("user://Offline")
+	DirAccess.make_dir_absolute("user://Backups")
 	DirAccess.make_dir_absolute("user://Data") #used to store tracker data in JSON, rather than images.
 	DirAccess.make_dir_absolute("user://Data/Min") 
 	DirAccess.make_dir_absolute("user://Data/Full") 
 	
 	get_tree().on_request_permissions_result.connect(perm_check)
+	
+	#ensure we have an error log to write to
+	if !FileAccess.file_exists(errorLog):
+		var log = FileAccess.open(errorLog, FileAccess.WRITE)
+		log.close()
 	
 	var platform = OS.get_name()
 	print(platform)
@@ -148,7 +153,6 @@ func _ready():
 				gps_provider.StartListening()
 	elif platform == "Web":
 		#Engage new web app location update loop instead of android plugin.
-		#Testing if I can make it as easy as this single string and single timer.
 		print("Starting web location provider")
 		var evalString = "startListening();"
 		var evalResults = JavaScriptBridge.eval(evalString)
@@ -175,7 +179,7 @@ func WebLocationUpdate():
 	if evalResults != "<null>":
 		var loc = JSON.parse_string(evalResults)
 		on_monitoring_location_result(loc.coords)
-
+	
 func GetStyle(style):
 	var styleData = FileAccess.open("res://PraxisMapper/Styles/" + style + ".json", FileAccess.READ)
 	if (styleData == null):
@@ -243,23 +247,60 @@ func GetCompassHeading():
 func LoadData(fileName):
 	var recentFile = FileAccess.open(fileName, FileAccess.READ)
 	if (recentFile == null):
+		var errorCode = FileAccess.get_open_error()
+		WriteErrorLog("Error reading data from " + fileName + ": " + str(errorCode) + " | " + str(Time.get_unix_time_from_system()))
 		return
 	else:
 		var json = JSON.new()
-		json.parse(recentFile.get_as_text())
+		var dataLoading = recentFile.get_as_text()
+		var errorParse = json.parse(dataLoading)
+		if errorParse != OK:
+			var errorLine = json.get_error_line()
+			var errorMessage = json.get_error_message()
+			WriteErrorLog("First Chars: " + dataLoading.substr(0,50))
+			WriteErrorLog("Error parsing data from " + fileName + ": " + str(errorParse) + " | Line " + str(errorLine) + ": " + errorMessage + " | " + str(Time.get_unix_time_from_system()))
 		var info = json.get_data()
+		if info is Dictionary:
+			if info.size() == 0:
+				WriteErrorLog("Got empty dictionary from " + fileName + " | " + str(Time.get_unix_time_from_system()))
 		recentFile.close()
 		return info
 
+var lastErrorData = ""
 #Convenience function
 func SaveData(fileName, dictionary):
 	var recentFile = FileAccess.open(fileName, FileAccess.WRITE)
 	if (recentFile == null):
-		print(FileAccess.get_open_error())
+		var errorCode = FileAccess.get_open_error()
+		print(errorCode)
+		WriteErrorLog("Error saving data to " + fileName + ": " + str(errorCode) + " | " + str(Time.get_unix_time_from_system()))
+		lastErrorData = "Opening Save File"
+		return false
 	
 	var json = JSON.new()
-	recentFile.store_string(json.stringify(dictionary))
+	var stringified = json.stringify(dictionary, '\t' if prettyPrintSaveData == true else '')
+	if stringified == null or stringified.length() < 5: #Should be empty on failure, allowing room for an empty dict "{}".
+		WriteErrorLog("Error changing data to JSON for " + fileName + " | " + str(Time.get_unix_time_from_system()))
+		lastErrorData = "Stringify to JSON"
+		return false
+		#TODO: how to save this out? I can't stringify this dictionary.
+		#var devDumpFilePath = OS.get_system_dir(OS.SYSTEM_DIR_DOWNLOADS)
+		#if !devDumpFilePath.ends_with("/"):
+			#devDumpFilePath += "/"
+		#devDumpFilePath += "lastFailedStringify.txt"
+		#var devDumpFile = FileAccess.open(devDumpFilePath, FileAccess.WRITE)
+		
+		
+	var stored = recentFile.store_string(stringified)
+	if stored == false:
+		var storeError = recentFile.get_error()
+		print(storeError)
+		WriteErrorLog("Error storing data to " + fileName + ": " + str(storeError) + " | " + str(Time.get_unix_time_from_system()))
+		lastErrorData = "Saving data"
+		recentFile.close()
+		return false
 	recentFile.close()
+	return true
 
 func PlusCodeToScreenCoords(plusCodeCoords, plusCodeScreenBase):
 	pass
@@ -267,3 +308,21 @@ func PlusCodeToScreenCoords(plusCodeCoords, plusCodeScreenBase):
 	#If my tiles are always the same size, I can do that here.
 	#take the first8 of PlusCodeScreenBase, and then work down the character pair differences
 	#until I have a solid running total.
+
+#TODO: backport to core components?
+var errorMutex = Mutex.new()
+func ReadErrorLog():
+	errorMutex.lock()
+	var file = FileAccess.open(errorLog, FileAccess.READ_WRITE)
+	var data = file.get_as_text()
+	file.close()
+	errorMutex.unlock()
+	return data
+
+func WriteErrorLog(errorData):
+	errorMutex.lock()
+	var file = FileAccess.open(errorLog, FileAccess.READ_WRITE)
+	file.seek_end()
+	file.store_line(errorData)
+	file.close()
+	errorMutex.unlock()

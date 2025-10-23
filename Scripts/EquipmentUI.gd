@@ -9,6 +9,8 @@ signal equipment_closed
 @onready var close_button = $Panel/VBoxContainer/TopBar/CloseButton if has_node("Panel/VBoxContainer/TopBar/CloseButton") else null
 @onready var title_label = $Panel/VBoxContainer/TopBar/Title if has_node("Panel/VBoxContainer/TopBar/Title") else null
 
+var starter_equipment_given = false
+
 # Equipment slot display data
 var equipment_slots = {
 	"pickaxe": {
@@ -47,8 +49,53 @@ func _ready():
 	
 	# Connect to PlayerData signals
 	PlayerData.equipment_changed.connect(_on_equipment_changed)
+	
+	# Ensure equipment structure exists
+	_ensure_equipment_structure()
+
+func _ensure_equipment_structure():
+	"""Make sure PlayerData has proper equipment structure"""
+	if not PlayerData.player_data.has("equipment"):
+		PlayerData.player_data["equipment"] = {}
+	
+	# Ensure all slots exist
+	for slot in equipment_slots.keys():
+		if not PlayerData.player_data["equipment"].has(slot):
+			PlayerData.player_data["equipment"][slot] = null
+	
+	# Give starter equipment on first load
+	if not starter_equipment_given and _is_equipment_empty():
+		_add_starter_equipment()
+
+func _is_equipment_empty() -> bool:
+	"""Check if player has any equipment"""
+	if not PlayerData.player_data.has("equipment"):
+		return true
+	
+	for slot in equipment_slots.keys():
+		var item = PlayerData.get_equipped_item(slot)
+		if item != null:
+			return false
+	
+	# Also check inventory for any equipment items
+	var inventory = PlayerData.get_all_items()
+	for item_name in inventory.keys():
+		if ItemDatabase.get_equipment_slot(item_name) != "":
+			return false
+	
+	return true
+
+func _add_starter_equipment():
+	"""Give player starter tools"""
+	if not starter_equipment_given:
+		PlayerData.add_item("bronze_pickaxe", 1)
+		PlayerData.add_item("bronze_axe", 1)
+		PlayerData.add_item("fishing_rod", 1)
+		starter_equipment_given = true
+		print("Added starter equipment")
 
 func show_equipment():
+	_ensure_equipment_structure()
 	visible = true
 	refresh_equipment()
 	refresh_stats()
@@ -252,9 +299,11 @@ func refresh_stats():
 	stats_panel.add_child(spacer2)
 	
 	var equipped_count = 0
-	for slot in PlayerData.player_data["equipment"]:
-		if PlayerData.get_equipped_item(slot) != null:
-			equipped_count += 1
+	# Safe equipment counting
+	if PlayerData.player_data.has("equipment") and typeof(PlayerData.player_data["equipment"]) == TYPE_DICTIONARY:
+		for slot in equipment_slots.keys():
+			if PlayerData.get_equipped_item(slot) != null:
+				equipped_count += 1
 	
 	var count_label = Label.new()
 	count_label.text = "Equipped: %d / 5" % equipped_count

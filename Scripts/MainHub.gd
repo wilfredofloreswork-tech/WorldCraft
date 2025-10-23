@@ -1,5 +1,6 @@
 extends Node3D
-# MainHub.gd - Main 3D hub scene controller with GPS integration
+# MainHub.gd - Main 3D hub scene 
+
 
 # UI References
 @onready var inventory_button = $HubUI/TopBar/HBoxContainer/MenuButtons/InventoryButton
@@ -7,6 +8,7 @@ extends Node3D
 @onready var skills_button = $HubUI/TopBar/HBoxContainer/MenuButtons/SkillsButton
 @onready var equipment_button = $HubUI/TopBar/HBoxContainer/MenuButtons/EquipmentButton
 @onready var pets_button = $HubUI/TopBar/HBoxContainer/MenuButtons/PetsButton
+@onready var debug_location_label: Label = null
 
 @onready var mining_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/MiningButton
 @onready var woodcutting_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/WoodcuttingButton
@@ -18,6 +20,46 @@ extends Node3D
 # 3D Scene References
 @onready var camera = $Camera3D
 @onready var player_avatar = $PlayerAvatar
+
+const DEFAULT_BIOME = "temperate"
+const BIOME_SEQUENCE = ["forest", "mountain", "coast", "urban", "temperate"]
+const BIOMES = {
+	"forest": {
+		"name": "🌲 Forest",
+		"description": "Dense woodland area",
+		"mining": "copper_ore",
+		"woodcutting": "oak_log",
+		"fishing": "raw_fish"
+	},
+	"mountain": {
+		"name": "⛰️ Mountains",
+		"description": "Rocky highland terrain",
+		"mining": "iron_ore",
+		"woodcutting": "oak_log",
+		"fishing": "salmon"
+	},
+	"coast": {
+		"name": "🏖️ Coastal",
+		"description": "Seaside area",
+		"mining": "gold_ore",
+		"woodcutting": "oak_log",
+		"fishing": "tuna"
+	},
+	"urban": {
+		"name": "🏙️ Urban",
+		"description": "City area",
+		"mining": "coal",
+		"woodcutting": "oak_log",
+		"fishing": "raw_fish"
+	},
+	"temperate": {
+		"name": "🌾 Temperate",
+		"description": "Mixed terrain",
+		"mining": "copper_ore",
+		"woodcutting": "oak_log",
+		"fishing": "raw_fish"
+	}
+}
 
 # UI Scenes
 var inventory_ui = null
@@ -32,6 +74,8 @@ var camera_rotation_speed = 0.1
 
 func _ready():
 	print("\n=== MAIN HUB LOADED ===")
+	
+	_setup_debug_display()
 	
 	# Connect UI buttons
 	equipment_button.pressed.connect(_on_equipment_pressed)
@@ -61,6 +105,9 @@ func _process(delta):
 	camera.position.z = cos(camera_rotation) * radius
 	camera.position.y = height
 	camera.look_at(player_avatar.position, Vector3.UP)
+	
+	if debug_location_label:
+		_update_debug_display()
 
 func load_ui_scenes():
 	# Load inventory UI
@@ -97,7 +144,7 @@ func load_ui_scenes():
 		print("WARNING: Could not load skills_ui.tscn")
 	
 	# Load equipment UI
-	var equipment_scene = load("res://UI/equipment_ui.tscn")
+	var equipment_scene = load("res://UI/equipment_UI.tscn")
 	if equipment_scene:
 		equipment_ui = equipment_scene.instantiate()
 		equipment_ui.visible = false
@@ -149,74 +196,18 @@ func _on_equipment_closed():
 func _on_pets_pressed():
 	print("Pets menu coming soon!")
 
-# ===== ACTIVITY BUTTON HANDLERS (GPS INTEGRATED) =====
+# ===== ACTIVITY BUTTON HANDLERS =====
 
 func _on_mining_pressed():
 	print("Starting mining minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get ore type from current biome
-	var ore_type = gps.get_biome_resource("mining")
-	var ore_display_name = ItemDatabase.get_item_display_name(ore_type)
-	
-	print("Mining " + ore_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_ore_type", get_ore_type_id(ore_type))
-	gps.set("pending_ore_name", ore_type)
-	
-	# Change scene
 	get_tree().change_scene_to_file("res://scenes/mining_mini.tscn")
 
 func _on_woodcutting_pressed():
 	print("Starting woodcutting minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get log type from current biome
-	var log_type = gps.get_biome_resource("woodcutting")
-	var log_display_name = ItemDatabase.get_item_display_name(log_type)
-	
-	print("Cutting " + log_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_log_type", log_type)
-	
-	# Change scene
 	get_tree().change_scene_to_file("res://scenes/woodcutting_mini.tscn")
 
 func _on_fishing_pressed():
 	print("Starting fishing minigame...")
-	
-	if not has_node("/root/GPSManager"):
-		print("ERROR: GPSManager not available!")
-		get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
-		return
-	
-	var gps = get_node("/root/GPSManager")
-	
-	# Get fish type from current biome
-	var fish_type = gps.get_biome_resource("fishing")
-	var fish_display_name = ItemDatabase.get_item_display_name(fish_type)
-	
-	print("Fishing for " + fish_display_name + " in " + gps.get_biome_name())
-	
-	# Store settings for minigame to pick up
-	gps.set("pending_fish_type", fish_type)
-	gps.set("pending_fish_name", fish_display_name)
-	
-	# Change scene
 	get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
 
 func get_ore_type_id(ore_name: String) -> int:
@@ -281,10 +272,66 @@ func _input(event):
 		print("Adding test items...")
 		PlayerData.debug_add_test_items()
 		update_player_info()
+		
+#gps
+
+
+func _setup_debug_display():
+	# Create a label for debug info
+	debug_location_label = Label.new()
+	debug_location_label.name = "DebugLocationLabel"
+	debug_location_label.position = Vector2(10, 10)
+	debug_location_label.z_index = 1000
 	
-	# Debug: Press L to test biome changes
-	if event.is_action_pressed("ui_page_down"):  # Page Down key
-		print("Testing biome changes...")
-		if has_node("/root/GPSManager"):
-			var gps = get_node("/root/GPSManager")
-			gps.test_biome_changes()
+	# Style it
+	debug_location_label.add_theme_font_size_override("font_size", 18)
+	debug_location_label.add_theme_color_override("font_color", Color.WHITE)
+	debug_location_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	debug_location_label.add_theme_constant_override("outline_size", 3)
+	
+	# Add to HubUI so it's always on top
+	$HubUI/Panel.add_child(debug_location_label)
+	
+func _update_debug_display():
+	if PraxisCore == null:
+		debug_location_label.text = "PraxisCore not found"
+		return
+	
+	var plus_code = PraxisCore.currentPlusCode
+	var lat = 0.0
+	var lon = 0.0
+	
+	# Try to get location from PraxisCore
+	if PraxisCore.last_location and typeof(PraxisCore.last_location) == TYPE_DICTIONARY:
+		lat = float(PraxisCore.last_location.get("latitude", 0.0))
+		lon = float(PraxisCore.last_location.get("longitude", 0.0))
+	
+	# Calculate biome
+	var biome_name = _get_biome_display_name()
+	
+	debug_location_label.text = "Plus Code: %s\nLat/Lon: %.6f, %.6f\nBiome: %s" % [
+		plus_code if plus_code != "" else "N/A",
+		lat,
+		lon,
+		biome_name
+	]
+
+func _get_biome_display_name() -> String:
+	var lat = 0.0
+	var lon = 0.0
+	
+	if PraxisCore and PraxisCore.last_location:
+		lat = float(PraxisCore.last_location.get("latitude", 0.0))
+		lon = float(PraxisCore.last_location.get("longitude", 0.0))
+	
+	var biome_id = _calculate_biome(lat, lon)
+	return BIOMES.get(biome_id, BIOMES[DEFAULT_BIOME]).get("name", "Unknown")
+
+func _calculate_biome(lat: float, lon: float) -> String:
+	if BIOME_SEQUENCE.is_empty():
+		return DEFAULT_BIOME
+
+	var lat_zone = posmod(int(floor(lat * 10.0)), BIOME_SEQUENCE.size())
+	var lon_zone = posmod(int(floor(lon * 10.0)), BIOME_SEQUENCE.size())
+	var index = (lat_zone + lon_zone) % BIOME_SEQUENCE.size()
+	return BIOME_SEQUENCE[index]
