@@ -36,14 +36,16 @@ const MAX_LOGS = 10
 var log_stack = []
 
 func _ready():
-	print("\n=== WOODCUTTING MINIGAME STARTING ===")
-	print("OS: " + OS.get_name())
-	print("Screen size: " + str(get_viewport().get_visible_rect().size))
-	
-	# DEBUG: Check all required nodes exist
-	if not spawn_timer:
-		print("ERROR: LogSpawnTimer not found!")
-		show_error_message("Missing: LogSpawnTimer")
+        print("\n=== WOODCUTTING MINIGAME STARTING ===")
+        print("OS: " + OS.get_name())
+        print("Screen size: " + str(get_viewport().get_visible_rect().size))
+
+        _apply_activity_context()
+
+        # DEBUG: Check all required nodes exist
+        if not spawn_timer:
+                print("ERROR: LogSpawnTimer not found!")
+                show_error_message("Missing: LogSpawnTimer")
 		return
 	
 	if not log_container:
@@ -250,10 +252,10 @@ func end_minigame():
 	show_results_screen(total_xp)
 
 func show_results_screen(total_xp: int):
-	print("Loading results screen...")
-	
-	if not ResourceLoader.exists("res://UI/results_screen.tscn"):
-		print("ERROR: results_screen.tscn not found!")
+        print("Loading results screen...")
+
+        if not ResourceLoader.exists("res://UI/results_screen.tscn"):
+                print("ERROR: results_screen.tscn not found!")
 		show_error_message("Cannot load results screen")
 		await get_tree().create_timer(2.0).timeout
 		return_to_hub()
@@ -264,12 +266,13 @@ func show_results_screen(total_xp: int):
 	add_child(results)
 	
 	var items_dict = {current_log_type: correct_sorts}
-	results.show_results(total_xp, items_dict, "🪓 Woodcutting Complete!")
-	results.continue_pressed.connect(return_to_hub)
+        results.show_results(total_xp, items_dict, "🪓 Woodcutting Complete!")
+        results.continue_pressed.connect(return_to_hub)
 
 func return_to_hub():
-	print("Returning to hub...")
-	get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
+        print("Returning to hub...")
+        PlayerData.clear_activity_context()
+        get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_cancel"):
@@ -287,5 +290,20 @@ func pause_or_quit():
 		PlayerData.add_xp("woodcutting", total_xp)
 		PlayerData.add_item(current_log_type, correct_sorts)
 	
-	print("Woodcutting quit early")
-	show_results_screen(correct_sorts * 20)
+        print("Woodcutting quit early")
+        show_results_screen(correct_sorts * 20)
+
+func _apply_activity_context():
+        var context = PlayerData.get_activity_context()
+        if context.is_empty():
+                return
+
+        if context.get("skill", "") != "woodcutting":
+                return
+
+        if context.has("resource_id"):
+                current_log_type = str(context["resource_id"])
+
+        if context.has("resource_name"):
+                print("Woodcutting context: " + str(context["resource_name"]))
+

@@ -58,10 +58,12 @@ const FISH_HEIGHT = 40.0
 @onready var progress_bar_node = $ProgressBar if has_node("ProgressBar") else null
 
 func _ready():
-	print("\n=== FISHING MINIGAME STARTING (540x1200) ===")
-	
-	# Initialize time
-	time_remaining = game_duration
+        print("\n=== FISHING MINIGAME STARTING (540x1200) ===")
+
+        _apply_activity_context()
+
+        # Initialize time
+        time_remaining = game_duration
 	
 	# Set up difficulty based on fish type
 	setup_fish_difficulty()
@@ -343,9 +345,9 @@ func get_base_xp_for_fish(fish_type: String) -> int:
 	return ItemDatabase.get_base_xp(fish_type)
 
 func show_results_screen(total_xp: int):
-	var results_scene = preload("res://UI/results_screen.tscn")
-	var results = results_scene.instantiate()
-	add_child(results)
+        var results_scene = preload("res://UI/results_screen.tscn")
+        var results = results_scene.instantiate()
+        add_child(results)
 	
 	var items_dict = {current_fish_type: session_items}
 	results.show_results(total_xp, items_dict, "🎣 Fishing Complete!")
@@ -353,8 +355,9 @@ func show_results_screen(total_xp: int):
 	results.continue_pressed.connect(return_to_map)
 
 func return_to_map():
-	print("Returning to hub...")
-	get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
+        print("Returning to hub...")
+        PlayerData.clear_activity_context()
+        get_tree().change_scene_to_file("res://scenes/main_hub.tscn")
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_cancel"):
@@ -370,5 +373,21 @@ func pause_or_quit():
 		PlayerData.add_item(current_fish_type, session_items)
 		PlayerData.add_xp("fishing", total_xp)
 	
-	print("Fishing quit early")
-	show_results_screen(session_items * get_base_xp_for_fish(current_fish_type))
+        print("Fishing quit early")
+        show_results_screen(session_items * get_base_xp_for_fish(current_fish_type))
+
+func _apply_activity_context():
+        var context = PlayerData.get_activity_context()
+        if context.is_empty():
+                return
+
+        if context.get("skill", "") != "fishing":
+                return
+
+        if context.has("resource_id"):
+                current_fish_type = str(context["resource_id"])
+
+        if context.has("resource_name"):
+                current_fish_name = str(context["resource_name"])
+
+        print("Fishing context: %s" % context)
