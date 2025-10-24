@@ -173,6 +173,11 @@ layout_mode = 2
 text = "🎣 Fishing
 "
 
+[node name="CombatButton" type="Button" parent="HubUI/BottomBar/VBoxContainer/ActivityButtons"]
+layout_mode = 2
+text = "⚔️Combat
+"
+
 [node name="Panel" type="Panel" parent="HubUI"]
 anchors_preset = 8
 anchor_left = 0.5

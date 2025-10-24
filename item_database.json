@@ -1,368 +1,472 @@
 {
-	"items": {
-		"copper_ore": {
-			"display_name": "Copper Ore",
-			"description": "Basic copper ore. Used in bronze crafting.",
-			"category": "resource",
-			"color": [0.72, 0.45, 0.20],
-			"base_xp": 10,
-			"skill": "mining"
-		},
-		"tin_ore": {
-			"display_name": "Tin Ore",
-			"description": "Tin ore. Combined with copper to make bronze.",
-			"category": "resource",
-			"color": [0.7, 0.7, 0.75],
-			"base_xp": 12,
-			"skill": "mining"
-		},
-		"iron_ore": {
-			"display_name": "Iron Ore",
-			"description": "Strong iron ore. Used in steel crafting.",
-			"category": "resource",
-			"color": [0.5, 0.5, 0.55],
-			"base_xp": 25,
-			"skill": "mining"
-		},
-		"coal": {
-			"display_name": "Coal",
-			"description": "Fuel for smelting. Required for steel.",
-			"category": "resource",
-			"color": [0.15, 0.15, 0.15],
-			"base_xp": 30,
-			"skill": "mining"
-		},
-		"gold_ore": {
-			"display_name": "Gold Ore",
-			"description": "Precious gold ore. Rare and valuable.",
-			"category": "resource",
-			"color": [1.0, 0.84, 0.0],
-			"base_xp": 50,
-			"skill": "mining"
-		},
-		"mithril_ore": {
-			"display_name": "Mithril Ore",
-			"description": "Legendary mithril ore. Extremely rare.",
-			"category": "resource",
-			"color": [0.5, 0.8, 1.0],
-			"base_xp": 100,
-			"skill": "mining"
-		},
-		"bronze_pickaxe": {
-			"display_name": "Bronze Pickaxe",
-			"description": "Basic pickaxe. +1s mining time.",
-			"category": "tool",
-			"color": [0.8, 0.5, 0.2],
-			"equipment_slot": "pickaxe",
-			"bonus_time": 1.0
-		},
-		"iron_pickaxe": {
-			"display_name": "Iron Pickaxe",
-			"description": "Sturdy iron pickaxe. +2s mining time.",
-			"category": "tool",
-			"color": [0.6, 0.6, 0.65],
-			"equipment_slot": "pickaxe",
-			"bonus_time": 2.0
-		},
-		"steel_pickaxe": {
-			"display_name": "Steel Pickaxe",
-			"description": "Strong steel pickaxe. +3s mining time.",
-			"category": "tool",
-			"color": [0.7, 0.7, 0.75],
-			"equipment_slot": "pickaxe",
-			"bonus_time": 3.0
-		},
-		"mithril_pickaxe": {
-			"display_name": "Mithril Pickaxe",
-			"description": "Legendary pickaxe. +5s mining time.",
-			"category": "tool",
-			"color": [0.6, 0.9, 1.0],
-			"equipment_slot": "pickaxe",
-			"bonus_time": 5.0
-		},
-		"bronze_axe": {
-			"display_name": "Bronze Axe",
-			"description": "Basic axe. +5s woodcutting time.",
-			"category": "tool",
-			"color": [0.8, 0.5, 0.2],
-			"equipment_slot": "axe",
-			"bonus_time": 5.0
-		},
-		"iron_axe": {
-			"display_name": "Iron Axe",
-			"description": "Sturdy iron axe. +10s woodcutting time.",
-			"category": "tool",
-			"color": [0.6, 0.6, 0.65],
-			"equipment_slot": "axe",
-			"bonus_time": 10.0
-		},
-		"steel_axe": {
-			"display_name": "Steel Axe",
-			"description": "Strong steel axe. +15s woodcutting time.",
-			"category": "tool",
-			"color": [0.7, 0.7, 0.75],
-			"equipment_slot": "axe",
-			"bonus_time": 15.0
-		},
-		"mithril_axe": {
-			"display_name": "Mithril Axe",
-			"description": "Legendary axe. +25s woodcutting time.",
-			"category": "tool",
-			"color": [0.6, 0.9, 1.0],
-			"equipment_slot": "axe",
-			"bonus_time": 25.0
-		},
-		"basic_rod": {
-			"display_name": "Basic Fishing Rod",
-			"description": "Simple fishing rod. +5s fishing time.",
-			"category": "tool",
-			"color": [0.6, 0.4, 0.2],
-			"equipment_slot": "fishing_rod",
-			"bonus_time": 5.0,
-			"bar_size_bonus": 0.02
-		},
-		"good_rod": {
-			"display_name": "Good Fishing Rod",
-			"description": "Quality fishing rod. +10s fishing time, larger catch bar.",
-			"category": "tool",
-			"color": [0.5, 0.5, 0.6],
-			"equipment_slot": "fishing_rod",
-			"bonus_time": 10.0,
-			"bar_size_bonus": 0.04
-		},
-		"great_rod": {
-			"display_name": "Great Fishing Rod",
-			"description": "Great fishing rod. +15s fishing time, larger catch bar.",
-			"category": "tool",
-			"color": [0.6, 0.6, 0.7],
-			"equipment_slot": "fishing_rod",
-			"bonus_time": 15.0,
-			"bar_size_bonus": 0.06
-		},
-		"master_rod": {
-			"display_name": "Master Fishing Rod",
-			"description": "Master fishing rod. +20s fishing time, much larger catch bar.",
-			"category": "tool",
-			"color": [0.7, 0.8, 1.0],
-			"equipment_slot": "fishing_rod",
-			"bonus_time": 20.0,
-			"bar_size_bonus": 0.08
-		},
-		"oak_log": {
-			"display_name": "Oak Log",
-			"description": "Basic oak logs for woodworking.",
-			"category": "resource",
-			"color": [0.6, 0.4, 0.2],
-			"base_xp": 20,
-			"skill": "woodcutting"
-		},
-		"raw_fish": {
-			"display_name": "Raw Fish",
-			"description": "Common fish. Can be cooked.",
-			"category": "resource",
-			"color": [0.7, 0.7, 0.8],
-			"base_xp": 15,
-			"skill": "fishing"
-		},
-		"salmon": {
-			"display_name": "Salmon",
-			"description": "Quality fish. Harder to catch.",
-			"category": "resource",
-			"color": [1.0, 0.6, 0.5],
-			"base_xp": 30,
-			"skill": "fishing"
-		},
-		"tuna": {
-			"display_name": "Tuna",
-			"description": "Large fish. Very challenging.",
-			"category": "resource",
-			"color": [0.4, 0.5, 0.8],
-			"base_xp": 50,
-			"skill": "fishing"
-		},
-		"lobster": {
-			"display_name": "Lobster",
-			"description": "Rare crustacean. Extremely difficult.",
-			"category": "resource",
-			"color": [0.9, 0.3, 0.2],
-			"base_xp": 80,
-			"skill": "fishing"
-		}
-	},
-	"recipes": {
-		"bronze_pickaxe": {
-			"requires": {
-				"copper_ore": 1,
-				"tin_ore": 1
-			},
-			"skill_required": {
-				"smithing": 1
-			},
-			"produces": "bronze_pickaxe",
-			"xp_granted": {
-				"smithing": 12.5
-			},
-			"category": "pickaxe"
-		},
-		"iron_pickaxe": {
-			"requires": {
-				"iron_ore": 3
-			},
-			"skill_required": {
-				"smithing": 15
-			},
-			"produces": "iron_pickaxe",
-			"xp_granted": {
-				"smithing": 25
-			},
-			"category": "pickaxe"
-		},
-		"steel_pickaxe": {
-			"requires": {
-				"iron_ore": 2,
-				"coal": 2
-			},
-			"skill_required": {
-				"smithing": 30
-			},
-			"produces": "steel_pickaxe",
-			"xp_granted": {
-				"smithing": 50
-			},
-			"category": "pickaxe"
-		},
-		"mithril_pickaxe": {
-			"requires": {
-				"mithril_ore": 4,
-				"coal": 4
-			},
-			"skill_required": {
-				"smithing": 50
-			},
-			"produces": "mithril_pickaxe",
-			"xp_granted": {
-				"smithing": 120
-			},
-			"category": "pickaxe"
-		},
-		"bronze_axe": {
-			"requires": {
-				"copper_ore": 1,
-				"tin_ore": 1
-			},
-			"skill_required": {
-				"smithing": 1
-			},
-			"produces": "bronze_axe",
-			"xp_granted": {
-				"smithing": 12.5
-			},
-			"category": "tool"
-		},
-		"iron_axe": {
-			"requires": {
-				"iron_ore": 3
-			},
-			"skill_required": {
-				"smithing": 15
-			},
-			"produces": "iron_axe",
-			"xp_granted": {
-				"smithing": 25
-			},
-			"category": "tool"
-		},
-		"steel_axe": {
-			"requires": {
-				"iron_ore": 2,
-				"coal": 2
-			},
-			"skill_required": {
-				"smithing": 30
-			},
-			"produces": "steel_axe",
-			"xp_granted": {
-				"smithing": 50
-			},
-			"category": "tool"
-		},
-		"mithril_axe": {
-			"requires": {
-				"mithril_ore": 4,
-				"coal": 4
-			},
-			"skill_required": {
-				"smithing": 50
-			},
-			"produces": "mithril_axe",
-			"xp_granted": {
-				"smithing": 120
-			},
-			"category": "tool"
-		},
-		"basic_rod": {
-			"requires": {
-				"oak_log": 5
-			},
-			"skill_required": {
-				"woodcutting": 5
-			},
-			"produces": "basic_rod",
-			"xp_granted": {
-				"woodcutting": 15
-			},
-			"category": "tool"
-		},
-		"good_rod": {
-			"requires": {
-				"oak_log": 10,
-				"iron_ore": 2
-			},
-			"skill_required": {
-				"woodcutting": 15,
-				"smithing": 10
-			},
-			"produces": "good_rod",
-			"xp_granted": {
-				"woodcutting": 30,
-				"smithing": 20
-			},
-			"category": "tool"
-		},
-		"great_rod": {
-			"requires": {
-				"oak_log": 15,
-				"iron_ore": 5,
-				"coal": 3
-			},
-			"skill_required": {
-				"woodcutting": 30,
-				"smithing": 25
-			},
-			"produces": "great_rod",
-			"xp_granted": {
-				"woodcutting": 60,
-				"smithing": 40
-			},
-			"category": "tool"
-		},
-		"master_rod": {
-			"requires": {
-				"oak_log": 25,
-				"mithril_ore": 5,
-				"gold_ore": 3
-			},
-			"skill_required": {
-				"woodcutting": 50,
-				"smithing": 50,
-				"fishing": 40
-			},
-			"produces": "master_rod",
-			"xp_granted": {
-				"woodcutting": 150,
-				"smithing": 100
-			},
-			"category": "tool"
-		}
-	}
+    "items": {
+        "Boss Goo": {
+            "display_name": "Boss Goo",
+            "description": "Why is it so ... gooey?",
+            "category": "resource",
+            "color": [
+                0,
+                1,
+                0.286
+            ],
+            "base_xp": 0,
+            "skill": "combat"
+        },
+        "copper_ore": {
+            "display_name": "Copper Ore",
+            "description": "Basic copper ore. Used in bronze crafting.",
+            "category": "resource",
+            "color": [
+                0.72,
+                0.45,
+                0.2
+            ],
+            "base_xp": 10,
+            "skill": "mining"
+        },
+        "tin_ore": {
+            "display_name": "Tin Ore",
+            "description": "Tin ore. Combined with copper to make bronze.",
+            "category": "resource",
+            "color": [
+                0.7,
+                0.7,
+                0.75
+            ],
+            "base_xp": 12,
+            "skill": "mining"
+        },
+        "iron_ore": {
+            "display_name": "Iron Ore",
+            "description": "Strong iron ore. Used in steel crafting.",
+            "category": "resource",
+            "color": [
+                0.5,
+                0.5,
+                0.55
+            ],
+            "base_xp": 25,
+            "skill": "mining"
+        },
+        "coal": {
+            "display_name": "Coal",
+            "description": "Fuel for smelting. Required for steel.",
+            "category": "resource",
+            "color": [
+                0.15,
+                0.15,
+                0.15
+            ],
+            "base_xp": 30,
+            "skill": "mining"
+        },
+        "gold_ore": {
+            "display_name": "Gold Ore",
+            "description": "Precious gold ore. Rare and valuable.",
+            "category": "resource",
+            "color": [
+                1,
+                0.84,
+                0
+            ],
+            "base_xp": 50,
+            "skill": "mining"
+        },
+        "mithril_ore": {
+            "display_name": "Mithril Ore",
+            "description": "Legendary mithril ore. Extremely rare.",
+            "category": "resource",
+            "color": [
+                0.5,
+                0.8,
+                1
+            ],
+            "base_xp": 100,
+            "skill": "mining"
+        },
+        "bronze_pickaxe": {
+            "display_name": "Bronze Pickaxe",
+            "description": "Basic pickaxe. +1s mining time.",
+            "category": "tool",
+            "color": [
+                0.8,
+                0.5,
+                0.2
+            ],
+            "equipment_slot": "pickaxe",
+            "bonus_time": 1
+        },
+        "iron_pickaxe": {
+            "display_name": "Iron Pickaxe",
+            "description": "Sturdy iron pickaxe. +2s mining time.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.6,
+                0.65
+            ],
+            "equipment_slot": "pickaxe",
+            "bonus_time": 2
+        },
+        "steel_pickaxe": {
+            "display_name": "Steel Pickaxe",
+            "description": "Strong steel pickaxe. +3s mining time.",
+            "category": "tool",
+            "color": [
+                0.7,
+                0.7,
+                0.75
+            ],
+            "equipment_slot": "pickaxe",
+            "bonus_time": 3
+        },
+        "mithril_pickaxe": {
+            "display_name": "Mithril Pickaxe",
+            "description": "Legendary pickaxe. +5s mining time.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.9,
+                1
+            ],
+            "equipment_slot": "pickaxe",
+            "bonus_time": 5
+        },
+        "bronze_axe": {
+            "display_name": "Bronze Axe",
+            "description": "Basic axe. +5s woodcutting time.",
+            "category": "tool",
+            "color": [
+                0.8,
+                0.5,
+                0.2
+            ],
+            "equipment_slot": "axe",
+            "bonus_time": 5
+        },
+        "iron_axe": {
+            "display_name": "Iron Axe",
+            "description": "Sturdy iron axe. +10s woodcutting time.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.6,
+                0.65
+            ],
+            "equipment_slot": "axe",
+            "bonus_time": 10
+        },
+        "steel_axe": {
+            "display_name": "Steel Axe",
+            "description": "Strong steel axe. +15s woodcutting time.",
+            "category": "tool",
+            "color": [
+                0.7,
+                0.7,
+                0.75
+            ],
+            "equipment_slot": "axe",
+            "bonus_time": 15
+        },
+        "mithril_axe": {
+            "display_name": "Mithril Axe",
+            "description": "Legendary axe. +25s woodcutting time.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.9,
+                1
+            ],
+            "equipment_slot": "axe",
+            "bonus_time": 25
+        },
+        "basic_rod": {
+            "display_name": "Basic Fishing Rod",
+            "description": "Simple fishing rod. +5s fishing time.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.4,
+                0.2
+            ],
+            "equipment_slot": "fishing_rod",
+            "bonus_time": 5,
+            "bar_size_bonus": 0.02
+        },
+        "good_rod": {
+            "display_name": "Good Fishing Rod",
+            "description": "Quality fishing rod. +10s fishing time, larger catch bar.",
+            "category": "tool",
+            "color": [
+                0.5,
+                0.5,
+                0.6
+            ],
+            "equipment_slot": "fishing_rod",
+            "bonus_time": 10,
+            "bar_size_bonus": 0.04
+        },
+        "great_rod": {
+            "display_name": "Great Fishing Rod",
+            "description": "Great fishing rod. +15s fishing time, larger catch bar.",
+            "category": "tool",
+            "color": [
+                0.6,
+                0.6,
+                0.7
+            ],
+            "equipment_slot": "fishing_rod",
+            "bonus_time": 15,
+            "bar_size_bonus": 0.06
+        },
+        "master_rod": {
+            "display_name": "Master Fishing Rod",
+            "description": "Master fishing rod. +20s fishing time, much larger catch bar.",
+            "category": "tool",
+            "color": [
+                0.7,
+                0.8,
+                1
+            ],
+            "equipment_slot": "fishing_rod",
+            "bonus_time": 20,
+            "bar_size_bonus": 0.08
+        },
+        "oak_log": {
+            "display_name": "Oak Log",
+            "description": "Basic oak logs for woodworking.",
+            "category": "resource",
+            "color": [
+                0.6,
+                0.4,
+                0.2
+            ],
+            "base_xp": 20,
+            "skill": "woodcutting"
+        },
+        "raw_fish": {
+            "display_name": "Raw Fish",
+            "description": "Common fish. Can be cooked.",
+            "category": "resource",
+            "color": [
+                0.7,
+                0.7,
+                0.8
+            ],
+            "base_xp": 15,
+            "skill": "fishing"
+        },
+        "salmon": {
+            "display_name": "Salmon",
+            "description": "Quality fish. Harder to catch.",
+            "category": "resource",
+            "color": [
+                1,
+                0.6,
+                0.5
+            ],
+            "base_xp": 30,
+            "skill": "fishing"
+        },
+        "tuna": {
+            "display_name": "Tuna",
+            "description": "Large fish. Very challenging.",
+            "category": "resource",
+            "color": [
+                0.4,
+                0.5,
+                0.8
+            ],
+            "base_xp": 50,
+            "skill": "fishing"
+        },
+        "lobster": {
+            "display_name": "Lobster",
+            "description": "Rare crustacean. Extremely difficult.",
+            "category": "resource",
+            "color": [
+                0.9,
+                0.3,
+                0.2
+            ],
+            "base_xp": 80,
+            "skill": "fishing"
+        }
+    },
+    "recipes": {
+        "bronze_pickaxe": {
+            "requires": {
+                "copper_ore": 1,
+                "tin_ore": 1
+            },
+            "skill_required": {
+                "smithing": 1
+            },
+            "produces": "bronze_pickaxe",
+            "xp_granted": {
+                "smithing": 12.5
+            },
+            "category": "pickaxe"
+        },
+        "iron_pickaxe": {
+            "requires": {
+                "iron_ore": 3
+            },
+            "skill_required": {
+                "smithing": 15
+            },
+            "produces": "iron_pickaxe",
+            "xp_granted": {
+                "smithing": 25
+            },
+            "category": "pickaxe"
+        },
+        "steel_pickaxe": {
+            "requires": {
+                "iron_ore": 2,
+                "coal": 2
+            },
+            "skill_required": {
+                "smithing": 30
+            },
+            "produces": "steel_pickaxe",
+            "xp_granted": {
+                "smithing": 50
+            },
+            "category": "pickaxe"
+        },
+        "mithril_pickaxe": {
+            "requires": {
+                "mithril_ore": 4,
+                "coal": 4
+            },
+            "skill_required": {
+                "smithing": 50
+            },
+            "produces": "mithril_pickaxe",
+            "xp_granted": {
+                "smithing": 120
+            },
+            "category": "pickaxe"
+        },
+        "bronze_axe": {
+            "requires": {
+                "copper_ore": 1,
+                "tin_ore": 1
+            },
+            "skill_required": {
+                "smithing": 1
+            },
+            "produces": "bronze_axe",
+            "xp_granted": {
+                "smithing": 12.5
+            },
+            "category": "tool"
+        },
+        "iron_axe": {
+            "requires": {
+                "iron_ore": 3
+            },
+            "skill_required": {
+                "smithing": 15
+            },
+            "produces": "iron_axe",
+            "xp_granted": {
+                "smithing": 25
+            },
+            "category": "tool"
+        },
+        "steel_axe": {
+            "requires": {
+                "iron_ore": 2,
+                "coal": 2
+            },
+            "skill_required": {
+                "smithing": 30
+            },
+            "produces": "steel_axe",
+            "xp_granted": {
+                "smithing": 50
+            },
+            "category": "tool"
+        },
+        "mithril_axe": {
+            "requires": {
+                "mithril_ore": 4,
+                "coal": 4
+            },
+            "skill_required": {
+                "smithing": 50
+            },
+            "produces": "mithril_axe",
+            "xp_granted": {
+                "smithing": 120
+            },
+            "category": "tool"
+        },
+        "basic_rod": {
+            "requires": {
+                "oak_log": 5
+            },
+            "skill_required": {
+                "woodcutting": 5
+            },
+            "produces": "basic_rod",
+            "xp_granted": {
+                "woodcutting": 15
+            },
+            "category": "tool"
+        },
+        "good_rod": {
+            "requires": {
+                "oak_log": 10,
+                "iron_ore": 2
+            },
+            "skill_required": {
+                "woodcutting": 15,
+                "smithing": 10
+            },
+            "produces": "good_rod",
+            "xp_granted": {
+                "woodcutting": 30,
+                "smithing": 20
+            },
+            "category": "tool"
+        },
+        "great_rod": {
+            "requires": {
+                "oak_log": 15,
+                "iron_ore": 5,
+                "coal": 3
+            },
+            "skill_required": {
+                "woodcutting": 30,
+                "smithing": 25
+            },
+            "produces": "great_rod",
+            "xp_granted": {
+                "woodcutting": 60,
+                "smithing": 40
+            },
+            "category": "tool"
+        },
+        "master_rod": {
+            "requires": {
+                "oak_log": 25,
+                "mithril_ore": 5,
+                "gold_ore": 3
+            },
+            "skill_required": {
+                "woodcutting": 50,
+                "smithing": 50,
+                "fishing": 40
+            },
+            "produces": "master_rod",
+            "xp_granted": {
+                "woodcutting": 150,
+                "smithing": 100
+            },
+            "category": "tool"
+        }
+    }
 }

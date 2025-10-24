@@ -13,6 +13,7 @@ extends Node3D
 @onready var mining_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/MiningButton
 @onready var woodcutting_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/WoodcuttingButton
 @onready var fishing_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/FishingButton
+@onready var combat_button = $HubUI/BottomBar/VBoxContainer/ActivityButtons/CombatButton
 
 @onready var player_name_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/PlayerName
 @onready var total_level_label = $HubUI/TopBar/HBoxContainer/PlayerInfo/TotalLevel
@@ -88,6 +89,7 @@ func _ready():
 	mining_button.pressed.connect(_on_mining_pressed)
 	woodcutting_button.pressed.connect(_on_woodcutting_pressed)
 	fishing_button.pressed.connect(_on_fishing_pressed)
+	combat_button.pressed.connect(_on_combat_pressed)
 	
 	
 	# Update player info
@@ -209,6 +211,10 @@ func _on_woodcutting_pressed():
 func _on_fishing_pressed():
 	print("Starting fishing minigame...")
 	get_tree().change_scene_to_file("res://scenes/fishing_mini.tscn")
+
+func _on_combat_pressed():
+	print("Starting combat...")
+	get_tree().change_scene_to_file("res://scenes/circular_combat_scene.tscn")
 
 func get_ore_type_id(ore_name: String) -> int:
 	"""Convert ore name to ore type ID for mining minigame"""

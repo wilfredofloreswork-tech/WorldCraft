@@ -11,6 +11,13 @@ signal skills_closed
 
 # Skill display info with colors and icons
 var skill_info = {
+	
+	"combat": {
+	"display_name": "Combat",
+	"icon": "⚔️",
+	"color": Color(0.8, 0.2, 0.2),
+	"description": "Fight enemies and bosses"
+	},
 	"mining": {
 		"display_name": "Mining",
 		"icon": "⛏️",
@@ -87,7 +94,7 @@ func refresh_skills():
 		total_level_label.text = "Total Level: " + str(total_level)
 	
 	# Create skill display for each skill
-	var skill_order = ["mining", "smithing", "woodcutting", "fishing", "herbalism", "cooking"]
+	var skill_order = ["mining", "smithing", "woodcutting", "fishing", "combat", "herbalism", "cooking"]
 	
 	for skill_name in skill_order:
 		var skill_card = create_skill_card(skill_name)
@@ -238,6 +245,8 @@ func refresh_stats():
 	add_stat_row(grid, "Items Crafted:", str(stats.get("items_crafted", 0)))
 	add_stat_row(grid, "Playtime:", format_time(stats.get("total_playtime", 0)))
 	add_stat_row(grid, "Distance Traveled:", "%.1f m" % stats.get("distance_traveled", 0))
+	add_stat_row(grid, "Bosses Defeated:", str(stats.get("bosses_defeated", 0)))
+	add_stat_row(grid, "Total Hits Landed:", str(stats.get("total_hits_landed", 0)))
 
 func add_stat_row(grid: GridContainer, label_text: String, value_text: String):
 	var label = Label.new()
