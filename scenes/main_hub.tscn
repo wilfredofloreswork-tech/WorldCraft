@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://dqtulre612u6"]
+[gd_scene load_steps=13 format=3 uid="uid://dqtulre612u6"]
 
 [ext_resource type="Script" uid="uid://c612yxomaykke" path="res://Scripts/MainHub.gd" id="1_7v7ny"]
 [ext_resource type="Texture2D" uid="uid://bra1xaslimjb1" path="res://sprites/rossypoo.png" id="2_7v7ny"]
+[ext_resource type="PackedScene" uid="uid://bpnt0yvbysdow" path="res://PraxisMapper/Controls/ScrollingCenteredMap2.tscn" id="3_map"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
@@ -24,7 +25,6 @@ glow_bloom = 0.2
 size = Vector2(20, 20)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
-albedo_color = Color(0.3, 0.5, 0.3, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3rplo"]
 albedo_texture = ExtResource("2_7v7ny")
@@ -57,8 +57,20 @@ skin = SubResource("Skin_edbvw")
 surface_material_override/0 = SubResource("StandardMaterial3D_e8wc2")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3, 5)
-fov = 60.0
+transform = Transform3D(0.0614626, -0.0355274, -0.997477, 0.998107, -2.68831e-09, 0.0615015, -0.00218499, -0.999369, 0.0354601, 0, 24.404, 0.0351639)
+fov = 89.1258
+
+[node name="MapViewport" type="SubViewport" parent="."]
+size = Vector2i(960, 1500)
+render_target_update_mode = 4
+
+[node name="ScrollingCenteredMap" parent="MapViewport" instance=ExtResource("3_map")]
+offset_left = -480.0
+offset_top = -750.0
+offset_right = 480.0
+offset_bottom = 750.0
+tileGridSize = 3
+showPlayerArrow = false
 
 [node name="HubUI" type="CanvasLayer" parent="."]
 

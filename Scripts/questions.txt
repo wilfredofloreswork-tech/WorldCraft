@@ -1,0 +1,4 @@
+1)am I correct in thinking that instead of rendering the whole world, I should link the ground to the character and move that along?
+2)Right now the map looks very mappy instead of looking like a gameworld. what will be my options for making it look less like a map and more like a world?
+3)What are my options for handling resources spawns. I want everybody who plays the game to have the same spawns
+4)now that It works in the browser, it would be nice to be able to test in mobile so I can move around with it. How difficult would it be to host praxis mapper on my own server?
