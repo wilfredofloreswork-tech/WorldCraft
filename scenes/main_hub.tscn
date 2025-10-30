@@ -6,7 +6,9 @@
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+ground_bottom_color = Color(0.404759, 0.50355, 0.618635, 1)
 ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+ground_curve = 0.468509
 
 [sub_resource type="Sky" id="Sky_hub"]
 sky_material = SubResource("ProceduralSkyMaterial_sky")
@@ -20,11 +22,20 @@ tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.3
 glow_bloom = 0.2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.15
+volumetric_fog_albedo = Color(0.81131, 0.792451, 0.946417, 1)
+volumetric_fog_anisotropy = -0.9
+volumetric_fog_length = 200.0
+volumetric_fog_ambient_inject = 0.4
+volumetric_fog_sky_affect = 0.8
+
+[sub_resource type="FogMaterial" id="FogMaterial_3rplo"]
+density = -0.3
+edge_fade = 0.466518
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
-size = Vector2(20, 20)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+size = Vector2(80, 100)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3rplo"]
 albedo_texture = ExtResource("2_7v7ny")
@@ -41,13 +52,18 @@ script = ExtResource("1_7v7ny")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_hub")
 
+[node name="FogVolume" type="FogVolume" parent="WorldEnvironment"]
+transform = Transform3D(70, 0, 0, 0, 40, 0, 0, 0, 90, 0, 0, 0)
+shape = 0
+material = SubResource("FogMaterial_3rplo")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 8, 0)
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 23.9914, 0)
 shadow_enabled = true
 
 [node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("PlaneMesh_ground")
-surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 
 [node name="PlayerAvatar" type="MeshInstance3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.5, 0)
@@ -57,8 +73,9 @@ skin = SubResource("Skin_edbvw")
 surface_material_override/0 = SubResource("StandardMaterial3D_e8wc2")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.0614626, -0.0355274, -0.997477, 0.998107, -2.68831e-09, 0.0615015, -0.00218499, -0.999369, 0.0354601, 0, 24.404, 0.0351639)
+transform = Transform3D(0.365149, -0.033809, -0.930335, 0.930947, 0.0109154, 0.364992, -0.00218499, -0.999369, 0.0354601, -56.1211, 24.404, 0.0351639)
 fov = 89.1258
+far = 80.0
 
 [node name="MapViewport" type="SubViewport" parent="."]
 size = Vector2i(960, 1500)
@@ -69,8 +86,10 @@ offset_left = -480.0
 offset_top = -750.0
 offset_right = 480.0
 offset_bottom = 750.0
-tileGridSize = 3
+useCellTrackers = false
 showPlayerArrow = false
+ShowTileOverlay = false
+freeRemovedTrackables = false
 
 [node name="HubUI" type="CanvasLayer" parent="."]
 

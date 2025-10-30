@@ -20,7 +20,7 @@ var style #same logic as for NameTiles
 #TODO: this would probably still benefit from splitting the sorting and drawing.
 func FastDraw(plusCode):
 	print("Start fastdraw")
-	style = PraxisCore.GetStyle("mapTiles")
+	style = PraxisCore.GetStyle("test")
 	var data = await PraxisOfflineData.GetDataFromZip(plusCode.substr(0,6))
 	theseentries = data.entries["mapTiles"]
 	drawnCode = plusCode

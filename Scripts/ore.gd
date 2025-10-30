@@ -72,7 +72,7 @@ func _ready():
 func set_ore_type(type: OreType):
 	"""Set the ore type and apply its properties"""
 	ore_type = type
-	print("Setting ore type to: " + str(type) + " (" + ore_data[type]["name"] + ")")
+	#print("Setting ore type to: " + str(type) + " (" + ore_data[type]["name"] + ")")
 	apply_ore_properties()
 
 func apply_ore_properties():
@@ -82,7 +82,7 @@ func apply_ore_properties():
 	max_health = data["health"]
 	current_health = max_health
 	
-	print("Applying properties for " + data["name"] + " with color: " + str(data["color"]))
+	#print("Applying properties for " + data["name"] + " with color: " + str(data["color"]))
 	
 	# Color the sprite - check multiple possible node paths
 	var sprite = null
@@ -90,22 +90,22 @@ func apply_ore_properties():
 	# Try different paths where sprite might be
 	if has_node("CollisionShape2D/Sprite2D"):
 		sprite = get_node("CollisionShape2D/Sprite2D")
-		print("Found sprite at CollisionShape2D/Sprite2D")
+		#print("Found sprite at CollisionShape2D/Sprite2D")
 	elif has_node("Sprite2D"):
 		sprite = get_node("Sprite2D")
-		print("Found sprite at Sprite2D")
+		#print("Found sprite at Sprite2D")
 	elif has_node("ColorRect"):
 		sprite = get_node("ColorRect")
-		print("Found ColorRect instead of sprite")
+		#print("Found ColorRect instead of sprite")
 	
 	if sprite:
 		sprite.modulate = data["color"]
-		print("Applied color: " + str(data["color"]) + " to " + sprite.name)
+		#print("Applied color: " + str(data["color"]) + " to " + sprite.name)
 	else:
 		print("WARNING: No sprite found to color! Checking children...")
 		# Debug: print all children
 		for child in get_children():
-			print("  Child: " + child.name + " (type: " + child.get_class() + ")")
+			#print("  Child: " + child.name + " (type: " + child.get_class() + ")")
 			if child is CollisionShape2D:
 				for subchild in child.get_children():
 					print("    Subchild: " + subchild.name + " (type: " + subchild.get_class() + ")")

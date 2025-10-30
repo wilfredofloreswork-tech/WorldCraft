@@ -12,7 +12,7 @@ var currentTile = ''
 @export var yOffset = 0
 @export var autoRefresh = false
 @export var autoRefreshSeconds = 60
-@export var styleSet = 'mapTiles'
+@export var styleSet = 'worldcraftstlye'
 var tileGeneration = 0
 var noiseTex : NoiseTexture2D
 

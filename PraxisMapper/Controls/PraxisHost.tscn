@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cnctpjt4eedin"]
 
-[ext_resource type="Script" uid="uid://cg2mqb5d45m25" path="res://PraxisMapper/Scenes/praxis_host.gd" id="1_1npn5"]
+[ext_resource type="Script" uid="uid://cg2mqb5d45m25" path="res://PraxisMapper/Controls/praxis_host.gd" id="1_1npn5"]
 
 [node name="PraxisHost" type="Node2D"]
 script = ExtResource("1_1npn5")

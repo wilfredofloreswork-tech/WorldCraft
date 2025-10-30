@@ -20,6 +20,7 @@ config/icon="uid://dsa0ep67ve2pl"
 ItemDatabase="*res://Scripts/ItemDatabase.gd"
 PlayerData="*res://Scripts/PlayerData.gd"
 PraxisCore="*res://PraxisMapper/Scripts/PraxisCore.gd"
+PlaceDataManager="*res://Scripts/PlaceDataManager.gd"
 
 [display]
 

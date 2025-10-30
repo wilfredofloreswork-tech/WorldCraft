@@ -1,6 +1,6 @@
 extends Node2D
 
-var serverPath = "https://global.praxismapper.org/"
+var serverPath = "https://conoscopic-noncorroboratively-benedict.ngrok-free.dev/"
 var cell4Path = "Content/OfflineData/" #Add cell2/cell4.zip to this URL, like: 2C/2CP2.zip
 var cell6Path = "Offline/FromZip/" # add the Cell6 only to get the JSON file
 var isActive = false
@@ -10,6 +10,9 @@ var skipTween = false
 signal file_downloaded()
 
 var queue = []
+var headers = [
+	"ngrok-skip-browser-warning: true"
+]
 
 func AddToQueue(file):
 	if !queue.has(file):
@@ -98,8 +101,8 @@ func getCell6File(plusCode6):
 	
 	$client.request_completed.connect(request_complete)
 	$client.download_file = "user://Data/Full/" + plusCode6 + ".json"
-	var file = serverPath + cell6Path + plusCode6
-	var status = $client.request(file)
+	var file = serverPath + cell6Path + plusCode6 + "?ngrok-skip-browser-warning=true"
+	var status = $client.request(file, headers)
 	print(file)
 	if status != Error.OK:
 		#TODO error stuff
@@ -123,7 +126,7 @@ func getCell6FileSync(plusCode6):
 	$client.request_completed.connect(request_complete)
 	$client.download_file = "user://Data/Full/" + plusCode6 + ".json"
 	print(serverPath + cell6Path + plusCode6)
-	var status = $client.request(serverPath + cell6Path + plusCode6)
+	var status = $client.request(serverPath + cell6Path + plusCode6 + "?ngrok-skip-browser-warning=true", headers)
 	if status != Error.OK:
 		#TODO error stuff
 		print("error calling download:" + str(status))

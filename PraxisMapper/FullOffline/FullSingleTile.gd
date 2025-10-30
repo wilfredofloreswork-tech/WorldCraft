@@ -13,7 +13,7 @@ var scaleVal = 1
 var mapData
 var wait = false
 
-@export var drawnStyle = "mapTiles"
+@export var drawnStyle = "worlfcraftstlye"
 @export var makeMapTile = true
 #@export var makeTerrainTile = false
 #@export var makeNameTile = false

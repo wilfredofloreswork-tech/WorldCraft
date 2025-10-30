@@ -38,7 +38,7 @@ static func GetDataFromZip(plusCode):
 	return json.data
 
 static func GetStyle(style):
-	return PraxisCore.GetStyle("suggestedmini")
+	return PraxisCore.GetStyle("worlfcraftstlye")
 
 #TODO: this no longer loads in Godot 4.3 beta. Why?
 func MakeMinimizedOfflineTiles(plusCode):

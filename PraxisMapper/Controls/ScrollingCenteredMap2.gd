@@ -24,12 +24,13 @@ extends Control
 
 var cellTrackerDrawerPL = preload("res://PraxisMapper/Controls/CellTrackerDrawer.tscn")
 
+
 ## If true, will also create CellTrackerDrawers for each tile that can have their visiblity set by showCellTrackers
 @export var useCellTrackers = true
 ## If true, and useCellTrackers is true, displays the CellTrackerDrawers overtop each tile. Toggle this to hide them.
 @export var showCellTrackers = true
 ## How many map tiles to use in this grid. 3 is the expected minimum. Use -1 to have this control auto-determine the size based on the control's size
-@export var tileGridSize = -1
+@export var tileGridSize = 5
 ## How many pixels to leave between tiles. 0 has them touching.
 @export var spacing = 0
 #TODO: may need to be passed in specific CellTracker object to draw?
@@ -75,6 +76,7 @@ func _ready():
 	PraxisCore.plusCode_changed.connect(plusCode_changed)
 	PraxisCore.force_redraw.connect(ForceRedraw)
 	plusCode_changed(PraxisCore.currentPlusCode, PraxisCore.lastPlusCode)
+	
 	
 func ToggleShowCellTrackerDrawers():
 	showCellTrackers = !showCellTrackers
@@ -162,18 +164,18 @@ func Setup():
 	
 	RefreshTiles(PraxisCore.currentPlusCode) 
 
-func AdjustBanner(positionVec2, sizeVec2):
+#func AdjustBanner(positionVec2, sizeVec2):
 	#this is for the dev to reposition the drawing/downloading banners on the map.
 	#TODO: finish testing this.
-	$TileDrawerQueued/Banner.global_position = positionVec2
-	$TileDrawerQueued/Banner/ColorRect.size = sizeVec2
-	$TileDrawerQueued/Banner/Status.size = sizeVec2
-	$TileDrawerQueued/Banner/Status.set("theme_override_font_sizes/font_size", sizeVec2.y * 0.8)
+	#$TileDrawerQueued/Banner.global_position = positionVec2
+	#$TileDrawerQueued/Banner/ColorRect.size = sizeVec2
+	#$TileDrawerQueued/Banner/Status.size = sizeVec2
+	#$TileDrawerQueued/Banner/Status.set("theme_override_font_sizes/font_size", sizeVec2.y * 0.8)
 	
-	$GetFile/Banner.global_position = positionVec2
-	$GetFile/Banner/ColorRect.size = sizeVec2
-	$GetFile/Banner/Label.size = sizeVec2
-	$GetFile/Banner/Label.set("theme_override_font_sizes/font_size", sizeVec2.y * 0.8)
+	#$GetFile/Banner.global_position = positionVec2
+	#$GetFile/Banner/ColorRect.size = sizeVec2
+	#$GetFile/Banner/Label.size = sizeVec2
+	#$GetFile/Banner/Label.set("theme_override_font_sizes/font_size", sizeVec2.y * 0.8)
 
 func plusCode_changed(current, old):
 	if !visible:

@@ -7,7 +7,7 @@ static var username = ''
 static var password = ''
 static var authKey = '' #for normal security with a login
 static var headerKey = '' #for header-only security
-static var serverURL = 'http://localhost:5005'
+static var serverURL = 'http://localhost:5000'
 #5005 is IPv6 setting for now, 5000 is ipv4
  #dedicated games want this to be a fixed value and not entered on the login screen.
 #NOTE: serverURL should NOT end with a /. Changed from Solar2D's pattern.

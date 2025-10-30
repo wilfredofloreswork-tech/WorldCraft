@@ -7,7 +7,7 @@ extends Node
 #Server calls go to PraxisServer. Offline data loading goes to PraxisOfflineData.
 
 #This variable should exist for debugging purposes, but I've provided a few choices for convenience.
-var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA, USA
+#var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA, USA
 #var debugStartingPlusCode = "87G8Q2JMGF" #Central Park, New York City, NY, USA
 #var debugStartingPlusCode = "8FW4V75W25" #Eiffel Tower Garden, France
 #var debugStartingPlusCode = "9C3XGV349C" #The Green Park, London, UK
@@ -15,6 +15,7 @@ var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA, USA
 #var debugStartingPlusCode = "8Q336FJCRV" #Peoples Park, Shanghai, China
 #var debugStartingPlusCode = "7JWVP5923M" #Shalimar Bagh, Delhi, India
 #var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH, USA
+var debugStartingPlusCode = "87G74PH8GR" #Jackson, New Jersey City, NY, USA
 
 #System global values
 #Resolution of PlusCode cells in degrees
@@ -157,6 +158,9 @@ func _ready():
 		webTimer.timeout.connect(WebLocationUpdate)
 		webTimer.wait_time = 0.5
 		webTimer.start()
+		var debugControlScene = preload("res://PraxisMapper/Controls/DebugMovement.tscn")
+		var debugControls = debugControlScene.instantiate()
+		add_child(debugControls)
 	else:
 		print("GPS Provider not loaded (probably debugging on PC)")
 			
@@ -180,6 +184,8 @@ func WebLocationUpdate():
 
 func GetStyle(style):
 	var styleData = FileAccess.open("res://PraxisMapper/Styles/" + style + ".json", FileAccess.READ)
+	
+	
 	if (styleData == null):
 		return null
 	else:

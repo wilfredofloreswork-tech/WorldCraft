@@ -17,7 +17,7 @@ var mapData
 var busy = false
 var tilesToDraw = []
 
-@export var drawnStyle = "mapTiles"
+@export var drawnStyle = "worldcraftstlye"
 @export var makeMapTile = true
 @export var alwaysDrawNewTile = false
 
@@ -35,7 +35,7 @@ func RunQueue():
 	#print("Running queue")
 	busy = true
 	while tilesToDraw.size() > 0:
-		$Banner.visible = true
+		$Banner.visible = false
 		#print("tiles queued:" + str(tilesToDraw.size()))
 		var tile = tilesToDraw.pop_back()
 		#print("popped " + tile)
@@ -59,7 +59,7 @@ func GetAndProcessData(plusCode, scale = 1):
 		fileForSize.close()
 	
 	var oneTile = null
-	$Banner.visible = true
+	$Banner.visible = false
 	#print("banner shown, at " + str($Banner.global_position))
 	$Banner/Status.text = "Drawing " + plusCode.substr(0,8)
 	#print("processing full offline data for single tile " + plusCode)

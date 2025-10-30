@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bpnt0yvbysdow"]
+[gd_scene load_steps=7 format=3 uid="uid://bpnt0yvbysdow"]
 
 [ext_resource type="Script" uid="uid://d1f647e0d5w1f" path="res://PraxisMapper/Controls/ScrollingCenteredMap2.gd" id="1_om4r7"]
 [ext_resource type="Texture2D" uid="uid://c3033wigb05gp" path="res://PraxisMapper/Resources/kenney_arrow.png" id="3_mhlsw"]
 [ext_resource type="PackedScene" uid="uid://fipn8k07sdhc" path="res://PraxisMapper/FullOffline/FullSingleTileQueued.tscn" id="3_x4y4u"]
 [ext_resource type="PackedScene" uid="uid://b2hnhr1t57jm7" path="res://PraxisMapper/Controls/CellTracker.tscn" id="5_i08gh"]
 [ext_resource type="PackedScene" uid="uid://bev1jin6r7t6n" path="res://PraxisMapper/Controls/GetFile.tscn" id="5_spgqn"]
+[ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="6_if6yf"]
 
 [node name="ScrollingCenteredMap" type="Control"]
 layout_mode = 3
@@ -20,6 +21,7 @@ offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_om4r7")
+ShowTileOverlay = true
 
 [node name="centerIndicator" type="ColorRect" parent="."]
 layout_mode = 1
@@ -78,6 +80,8 @@ horizontal_alignment = 1
 [node name="trackedChildren" type="Node2D" parent="."]
 
 [node name="TileDrawerQueued" parent="." instance=ExtResource("3_x4y4u")]
+
+[node name="PraxisEndpoints" parent="." instance=ExtResource("6_if6yf")]
 
 [node name="playerIndicator" type="TextureRect" parent="."]
 z_index = 1
