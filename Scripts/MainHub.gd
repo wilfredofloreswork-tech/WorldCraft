@@ -390,7 +390,7 @@ func _generate_resource_for_cell(pluscode: String, attempt: int, spawn_chance: f
 		return {}
 	
 	# Get biome data from PraxisOfflineData
-	var biome_data = await PraxisOfflineData.GetBiomeDataForCell(pluscode)
+        var biome_data = PraxisOfflineData.GetBiomeDataForCell(pluscode)
 	var spawn_weights = biome_data["spawn_weights"]
 	
 	# Calculate weighted random selection
@@ -859,7 +859,7 @@ func _update_debug_display():
 		lat = float(PraxisCore.last_location.get("latitude", 0.0))
 		lon = float(PraxisCore.last_location.get("longitude", 0.0))
 	
-	var biome_name = await _get_biome_display_name()
+        var biome_name = _get_biome_display_name()
 	var resource_count = spawned_resources.size()
 	
 	debug_location_label.text = "Plus Code: %s\nLat/Lon: %.6f, %.6f\nBiome: %s\nResources: %d" % [
@@ -872,7 +872,7 @@ func _update_debug_display():
 
 func _get_biome_display_name() -> String:
 	"""Get the display name for the current biome"""
-	if PraxisCore and PraxisCore.currentPlusCode != "":
-		var biome_data = await PraxisOfflineData.GetBiomeDataForCell(PraxisCore.currentPlusCode)
-		return biome_data.get("biome_name", "🌾 Wilderness")
+        if PraxisCore and PraxisCore.currentPlusCode != "":
+                var biome_data = PraxisOfflineData.GetBiomeDataForCell(PraxisCore.currentPlusCode)
+                return biome_data.get("biome_name", "🌾 Wilderness")
 	return "Unknown"

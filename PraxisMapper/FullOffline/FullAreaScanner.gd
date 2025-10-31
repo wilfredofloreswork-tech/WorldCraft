@@ -22,7 +22,8 @@ func ReadPlaces(plusCode, category, terrainID, requirements, options = [], ignor
 		options = {}
 	if ignoreList == null:
 		ignoreList = {}
-	var areaData = await PraxisOfflineData.GetDataFromZip(plusCode)
+        PraxisOfflineData.PrepareDataAsync(plusCode)
+        var areaData = PraxisOfflineData.GetDataFromZip(plusCode)
 	var ignoreArray = []
 	if ignoreList.has(plusCode):
 		ignoreArray = ignoreList[plusCode]

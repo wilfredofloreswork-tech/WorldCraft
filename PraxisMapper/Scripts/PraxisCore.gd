@@ -17,6 +17,8 @@ extends Node
 #var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH, USA
 var debugStartingPlusCode = "87G74PH8GR" #Jackson, New Jersey City, NY, USA
 
+var _style_cache : Dictionary = {}
+
 #System global values
 #Resolution of PlusCode cells in degrees
 const resolutionCell12Lat = .000025 / 5
@@ -183,15 +185,21 @@ func WebLocationUpdate():
 		on_monitoring_location_result(loc.coords)
 
 func GetStyle(style):
-	var styleData = FileAccess.open("res://PraxisMapper/Styles/" + style + ".json", FileAccess.READ)
-	
-	
-	if (styleData == null):
-		return null
-	else:
-		var json = JSON.new()
-		json.parse(styleData.get_as_text())
-		return json.get_data()
+        if _style_cache.has(style):
+                return _style_cache[style]
+
+        var styleData = FileAccess.open("res://PraxisMapper/Styles/" + style + ".json", FileAccess.READ)
+
+
+        if (styleData == null):
+                return null
+        else:
+                var json = JSON.new()
+                json.parse(styleData.get_as_text())
+                var data = json.get_data()
+                if data != null:
+                        _style_cache[style] = data
+                return data
 
 #This needs to be called by a node that exists in a tree, not just a static script, so its here.
 func MakeMinimizedOfflineTiles(plusCode):

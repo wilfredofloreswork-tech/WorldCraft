@@ -22,10 +22,24 @@ func _process(delta):
 		busy = false
 
 func AddToQueue(code):
-	if !tilesToDraw.has(code):
-		tilesToDraw.push_back(code)
+        _prewarm_data(code)
+        if !tilesToDraw.has(code):
+                tilesToDraw.push_back(code)
 
 func DrawTile(code):
-	var img = await drawer.GetAndProcessData(code)
-	tile_done.emit(code, img)
-	return img
+        var img = await drawer.GetAndProcessData(code)
+        tile_done.emit(code, img)
+        return img
+
+func _prewarm_data(code):
+        var pending = {}
+        var cell6 = code.substr(0,6)
+        pending[cell6] = true
+        for neighbor in PlusCodes.GetNearbyCells(code, 1):
+                if neighbor == null:
+                        continue
+                var trimmed = neighbor.substr(0,6)
+                pending[trimmed] = true
+
+        for key in pending.keys():
+                PraxisOfflineData.PrepareDataAsync(key)

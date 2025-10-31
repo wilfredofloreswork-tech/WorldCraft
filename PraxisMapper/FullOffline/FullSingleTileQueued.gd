@@ -70,10 +70,11 @@ func GetAndProcessData(plusCode, scale = 1):
 	#also seeing if this can be removed.  SEEMS SAFE TO REMOVE.
 	#await RenderingServer.frame_post_draw
 	
-	var styleData = await PraxisCore.GetStyle(drawnStyle)
+        var styleData = PraxisCore.GetStyle(drawnStyle)
 	$svc/SubViewport/fullMap.style = styleData
 	
-	mapData = await PraxisOfflineData.GetDataFromZip(plusCode6) 
+        PraxisOfflineData.PrepareDataAsync(plusCode6)
+        mapData = PraxisOfflineData.GetDataFromZip(plusCode6)
 	if (mapData == null):
 		$Banner.visible = false
 		return

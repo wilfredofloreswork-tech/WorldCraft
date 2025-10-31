@@ -40,15 +40,16 @@ func GetAndProcessData(plusCode, scale = 1):
 	await RenderingServer.frame_post_draw
 	
 	$Banner/lblStatus.text = "Getting Style"
-	var styleData = await PraxisCore.GetStyle(drawnStyle)
+        var styleData = PraxisCore.GetStyle(drawnStyle)
 	$Banner/lblStatus.text = "Style loaded."
 	$svc/SubViewport/fullMap.style = styleData
 	$svc2/SubViewport/nameMap.style = styleData
 	$svc4/SubViewport/terrainMap.style = styleData
 	if makeBoundsTile: #Always uses its own style
-		$svc3/SubViewport/boundsMap.style = await PraxisCore.GetStyle("adminBoundsFilled")
+                $svc3/SubViewport/boundsMap.style = PraxisCore.GetStyle("adminBoundsFilled")
 	
-	mapData = await PraxisOfflineData.GetDataFromZip(plusCode6) 
+        PraxisOfflineData.PrepareDataAsync(plusCode6)
+        mapData = PraxisOfflineData.GetDataFromZip(plusCode6)
 	if (mapData == null):
 		$Banner/lblStatus.text = "Error getting map data. Try again." 
 		return

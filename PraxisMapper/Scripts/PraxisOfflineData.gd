@@ -3,6 +3,9 @@ class_name PraxisOfflineData
 
 #Once we read a file from disk, keep it in memory. Odds are high the player will read it again.
 static var allData = {}
+static var _loading_threads : Dictionary = {}
+static var _data_mutex : Mutex = Mutex.new()
+static var _loading_mutex : Mutex = Mutex.new()
 
 # ===== BIOME SYSTEM CONSTANTS =====
 
@@ -102,44 +105,119 @@ static func OfflineDataExists(plusCode):
 # ===== DATA LOADING =====
 
 static func GetDataFromZip(plusCode): #full, drawable offline data.
-	if allData.has(plusCode):
-		return allData[plusCode]
-	
-	var code2 = plusCode.substr(0, 2)
-	var code4 = plusCode.substr(2, 2)
-	var zipReader = ZIPReader.new()
-	
-	#CHECK: if we have a single downloaded JSON file, use it.
-	if FileAccess.file_exists("user://Data/Full/" + plusCode.substr(0,6) + ".json"):
-		var soloFile = FileAccess.open("user://Data/Full/" + plusCode.substr(0,6) + ".json", FileAccess.READ)
-		var json = JSON.new()
-		json.parse(soloFile.get_as_text())
-		
-		var jsonData = json.data
-		if jsonData == null: #no good data here? this area is missing or empty?
-			return null
-		return ProcessData(jsonData)
+        var code6 = plusCode.substr(0,6)
 
-	#Now check if we have the zip file that should hold this data, built in or downloaded
-	var err
-	if FileAccess.file_exists("res://OfflineData/Full/" + code2 + "/" + code2 + code4 + ".zip"):
-		err = await zipReader.open("res://OfflineData/Full/" + plusCode.substr(0,2) + "/" + plusCode.substr(0,4) + ".zip")
-	elif FileAccess.file_exists("user://Data/Full/" + code2 + code4 + ".zip"):
-		err = await zipReader.open("user://Data/Full/" + code2 + code4 + ".zip")
+        var cached = _get_cached_data(code6)
+        if cached != null:
+                return cached
 
-	if err != OK:
-		#print("No FullOffline data found (or zip corrupt/incomplete) for " + plusCode + ": " + str(err))
-		return 
-		
-	var rawdata := await zipReader.read_file(plusCode + ".json")
-	var realData = await rawdata.get_string_from_utf8()
-	var json = JSON.new()
-	await json.parse(realData)
-	var jsonData = json.data
-	if jsonData == null: #no file in this zip, this area is missing or empty.
-		return 
-	
-	return ProcessData(jsonData)
+        var thread_result = _wait_for_thread(code6)
+        if thread_result != null:
+                return thread_result
+
+        var data = _load_data_sync(code6)
+        if data != null:
+                _cache_data(code6, data)
+        return data
+
+static func PrepareDataAsync(plusCode):
+        var code6 = plusCode.substr(0,6)
+        if _get_cached_data(code6) != null:
+                return
+        _loading_mutex.lock()
+        if _loading_threads.has(code6):
+                _loading_mutex.unlock()
+                return
+
+        var task_id = WorkerThreadPool.add_task(Callable(PraxisOfflineData, "_thread_task").bind(code6))
+        _loading_threads[code6] = task_id
+        _loading_mutex.unlock()
+
+static func _thread_task(code6):
+        var data = _load_data_sync(code6)
+        if data != null:
+                _cache_data(code6, data)
+        _loading_mutex.lock()
+        _loading_threads.erase(code6)
+        _loading_mutex.unlock()
+
+static func _wait_for_thread(code6):
+        _loading_mutex.lock()
+        if !_loading_threads.has(code6):
+                _loading_mutex.unlock()
+                return _get_cached_data(code6)
+        var task_id = _loading_threads[code6]
+        _loading_mutex.unlock()
+
+        WorkerThreadPool.wait_for_task_completion(task_id)
+
+        _loading_mutex.lock()
+        _loading_threads.erase(code6)
+        _loading_mutex.unlock()
+
+        return _get_cached_data(code6)
+
+static func _get_cached_data(code6):
+        _data_mutex.lock()
+        var cached = null
+        if allData.has(code6):
+                cached = allData[code6]
+        _data_mutex.unlock()
+        return cached
+
+static func _cache_data(code6, data):
+        _data_mutex.lock()
+        allData[code6] = data
+        _data_mutex.unlock()
+
+static func _load_data_sync(plusCode):
+        var cached = _get_cached_data(plusCode)
+        if cached != null:
+                return cached
+
+        var code2 = plusCode.substr(0, 2)
+        var code4 = plusCode.substr(2, 2)
+        var zipReader = ZIPReader.new()
+
+        #CHECK: if we have a single downloaded JSON file, use it.
+        if FileAccess.file_exists("user://Data/Full/" + plusCode.substr(0,6) + ".json"):
+                var soloFile = FileAccess.open("user://Data/Full/" + plusCode.substr(0,6) + ".json", FileAccess.READ)
+                if soloFile == null:
+                        return null
+                var json = JSON.new()
+                var err = json.parse(soloFile.get_as_text())
+                if err != OK:
+                        return null
+
+                var jsonData = json.data
+                if jsonData == null: #no good data here? this area is missing or empty?
+                        return null
+                return ProcessData(jsonData)
+
+        #Now check if we have the zip file that should hold this data, built in or downloaded
+        var err = ERR_CANT_OPEN
+        if FileAccess.file_exists("res://OfflineData/Full/" + code2 + "/" + code2 + code4 + ".zip"):
+                err = zipReader.open("res://OfflineData/Full/" + plusCode.substr(0,2) + "/" + plusCode.substr(0,4) + ".zip")
+        elif FileAccess.file_exists("user://Data/Full/" + code2 + code4 + ".zip"):
+                err = zipReader.open("user://Data/Full/" + code2 + code4 + ".zip")
+
+        if err != OK:
+                #print("No FullOffline data found (or zip corrupt/incomplete) for " + plusCode + ": " + str(err))
+                return null
+
+        var rawdata : PackedByteArray = zipReader.read_file(plusCode + ".json")
+        if rawdata.is_empty():
+                return null
+        var realData = rawdata.get_string_from_utf8()
+        var json = JSON.new()
+        var parse_err = json.parse(realData)
+        if parse_err != OK:
+                return null
+        var jsonData = json.data
+        if jsonData == null: #no file in this zip, this area is missing or empty.
+                return null
+
+        return ProcessData(jsonData)
 
 # ===== DATA PROCESSING WITH BIOME SYSTEM =====
 
@@ -237,8 +315,8 @@ static func ProcessData(jsonData):
 	var diff = end - start
 	#print("Data processed " + str(totalCount) + " items in " + str(diff) + " seconds")
 	#print("Biome data calculated for " + str(biomeIndex.size()) + " Cell8 areas")
-	allData[jsonData.olc] = jsonData
-	return jsonData
+        _cache_data(jsonData.olc, jsonData)
+        return jsonData
 
 # ===== BIOME HELPER FUNCTIONS =====
 
@@ -362,7 +440,7 @@ static func GetBiomeDataForCell(plusCode: String) -> Dictionary:
 	
 	
 	# Load the data if not cached
-	var data = await GetDataFromZip(cell6)
+        var data = GetDataFromZip(cell6)
 	if data == null or not data.has("index") or not data.index.has("biomes"):
 		print("No biome data available")
 		return _get_default_biome()
@@ -433,7 +511,7 @@ static func _get_default_biome() -> Dictionary:
 # ===== PLACE DETECTION =====
 
 static func GetPlacesPresent(plusCode):
-	var data = await GetDataFromZip(plusCode.substr(0,6))
+        var data = GetDataFromZip(plusCode.substr(0,6))
 	if data == null:
 		return
 	var point = PlusCodeToDataCoords(plusCode)
