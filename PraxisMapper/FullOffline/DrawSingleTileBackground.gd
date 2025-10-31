@@ -21,7 +21,8 @@ var style #same logic as for NameTiles
 func FastDraw(plusCode):
 	print("Start fastdraw")
 	style = PraxisCore.GetStyle("test")
-	var data = await PraxisOfflineData.GetDataFromZip(plusCode.substr(0,6))
+        PraxisOfflineData.PrepareDataAsync(plusCode.substr(0,6))
+        var data = PraxisOfflineData.GetDataFromZip(plusCode.substr(0,6))
 	theseentries = data.entries["mapTiles"]
 	drawnCode = plusCode
 	print("data loaded, drawing")

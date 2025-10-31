@@ -160,7 +160,7 @@ func CheckForPlaceFull(plusCode10):
 
 func GetDataOnPointFull(plusCode10):
 	var results = []
-	var places = await PraxisOfflineData.GetPlacesPresent(plusCode10)
+        var places = PraxisOfflineData.GetPlacesPresent(plusCode10)
 	for place in places:
 		if place.category == category:
 			results.push_back(place.name + "|" + str(place.typeId))
